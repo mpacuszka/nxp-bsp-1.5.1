@@ -123,7 +123,7 @@ DriverEntry(
     initData.RequestDpc = SdhcSlotRequestDpc;
     initData.SaveContext = SdhcSlotSaveContext;
     initData.RestoreContext = SdhcSlotRestoreContext;
-    initData.PowerControlCallback = nullptr;
+    initData.PowerControlCallback = SdhcPowerControlCallback;
     initData.Cleanup = SdhcCleanup;
 
     initData.PrivateExtensionSize = sizeof(USDHC_EXTENSION);
@@ -139,6 +139,9 @@ DriverEntry(
     //
     NTSTATUS status = SdPortInitialize(DriverObjectPtr, RegistryPathPtr, &initData);
     if (!NT_SUCCESS(status)) {
+#ifdef WPP_TRACING
+        WPP_CLEANUP(DriverObjectPtr);
+#endif
         NT_ASSERTMSG("SdPortInitialize() failed", FALSE);
         return status;
     }
@@ -1337,6 +1340,29 @@ SdhcCompleteRequest(
     }
 
     SdPortCompleteRequest(RequestPtr, Status);
+}
+
+_Use_decl_annotations_
+NTSTATUS
+SdhcPowerControlCallback(
+    _In_ PSD_MINIPORT Miniport,
+    _In_ LPCGUID PowerControlCode,
+    _In_reads_bytes_opt_(InputBufferSize) PVOID InputBuffer,
+    _In_ SIZE_T InputBufferSize,
+    _Out_writes_bytes_opt_(OutputBufferSize) PVOID OutputBuffer,
+    _In_ SIZE_T OutputBufferSize,
+    _Out_opt_ PSIZE_T BytesReturned
+)
+{
+    UNREFERENCED_PARAMETER(Miniport);
+    UNREFERENCED_PARAMETER(PowerControlCode);
+    UNREFERENCED_PARAMETER(InputBuffer);
+    UNREFERENCED_PARAMETER(InputBufferSize);
+    UNREFERENCED_PARAMETER(OutputBuffer);
+    UNREFERENCED_PARAMETER(OutputBufferSize);
+    UNREFERENCED_PARAMETER(BytesReturned);
+
+    return STATUS_NOT_IMPLEMENTED;
 }
 
 _Use_decl_annotations_
