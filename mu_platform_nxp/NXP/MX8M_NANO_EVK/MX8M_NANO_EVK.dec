@@ -1,0 +1,15 @@
+[Defines]
+  PACKAGE_NAME                   = imx8MnPkg
+  PACKAGE_GUID                   = c97a39bd-0a44-42e5-afd2-ea77d4ed900f
+# TODO rewrite PACKAGE_GUID
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package

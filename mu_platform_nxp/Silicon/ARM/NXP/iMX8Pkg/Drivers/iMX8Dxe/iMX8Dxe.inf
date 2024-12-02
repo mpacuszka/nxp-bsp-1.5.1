@@ -1,0 +1,86 @@
+#
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#  Copyright (c) 2013-2015, ARM Limited. All rights reserved.
+#  Copyright 2022-2023 NXP
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = iMX8Dxe
+  FILE_GUID                      = 6E261F6C-4CF8-DF84-9226-17A360B03D84
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = iMX8EntryPoint
+
+[Sources.common]
+  iMX8Dxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ARM/ARM.dec
+  iMX8Pkg/iMX8Pkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmShellCmdRunAxfLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  IoLib
+  NonDiscoverableDeviceRegistrationLib
+  PcdLib
+  PrintLib
+  SerialPortLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiFileInfoGuid
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gPlatformBootManagerProtocolGuid  ## CONSUMES
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+  gArmTokenSpaceGuid.PcdHypFvBaseAddress
+  gArmTokenSpaceGuid.PcdHypFvSize
+
+  giMX8TokenSpaceGuid.PcdUsb1XhciBaseAddress
+  giMX8TokenSpaceGuid.PcdUsb2XhciBaseAddress
+  giMX8TokenSpaceGuid.PcdUsb1EhciBaseAddress
+  giMX8TokenSpaceGuid.PcdUsb2EhciBaseAddress
+  giMX8TokenSpaceGuid.PcdFlexSpiBaseAddress
+
+  giMX8TokenSpaceGuid.PcdBootDevice1Path        ## PRODUCES
+  giMX8TokenSpaceGuid.PcdBootDevice1Description ## PRODUCES
+  giMX8TokenSpaceGuid.PcdBootDevice2Path        ## PRODUCES
+  giMX8TokenSpaceGuid.PcdBootDevice2Description ## PRODUCES
+
+  gEfiMdePkgTokenSpaceGuid.PcdUefiRuntimeDebugEnable
+  giMXPlatformTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+
+[Depex]
+  # We depend on these protocols to create the default boot entries
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

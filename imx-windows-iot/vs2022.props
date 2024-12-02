@@ -1,0 +1,16 @@
+<Project>
+<PropertyGroup Condition="'$(ConfigurationType)' != 'Driver'">
+	<Nxp_PlatformToolset>v143</Nxp_PlatformToolset>
+</PropertyGroup>
+<PropertyGroup>
+    <Nxp_temp_include_root>$(UniversalCRTSdkDir)\Include\$(Version_Number)</Nxp_temp_include_root>
+    <Nxp_temp_lib_root>$(WindowsSdkDir)\lib\$(Version_Number)</Nxp_temp_lib_root>
+    <ExternalIncludePath>$(Nxp_temp_include_root)\um;$(Nxp_temp_include_root)\shared;$(Nxp_temp_include_root)\ucrt;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(Nxp_temp_lib_root)\ucrt\$(Platform);$(Nxp_temp_lib_root)\um\$(Platform);$(VCToolsInstallDir)\lib\$(Platform);$(LibraryPath)</LibraryPath>
+</PropertyGroup>
+<ItemDefinitionGroup>
+<ClCompile>
+  <DisableSpecificWarnings>4214;4221;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+</ClCompile>
+</ItemDefinitionGroup>
+</Project>

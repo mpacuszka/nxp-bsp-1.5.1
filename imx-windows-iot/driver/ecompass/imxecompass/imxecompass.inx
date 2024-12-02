@@ -1,0 +1,91 @@
+/*++
+;
+;Copyright (c) Microsoft Corporation.  All rights reserved.
+;Copyright 2022 NXP
+;
+;Module Name:
+;    imxecompass.INF
+;
+;Abstract:
+;    INF file for installing the Sensors 2.0 imxecompass Accelerometer Sample Driver
+;
+;--*/
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = Sensor
+ClassGuid   = {5175D334-C371-4806-B3BA-71FD53C9258D}
+Provider    = %ProviderName%
+PnpLockdown = 1
+CatalogFile = imxecompass.cat
+DriverVer   = ; stampinf will fill in driver version
+
+[DestinationDirs]
+;12 == Windows\System32\Drivers\UMDF
+DefaultDestDir = 12,UMDF
+
+[SourceDisksNames]
+1 = %MediaDescription%,,,""
+
+[SourceDisksFiles]
+imxecompass.dll   = 1,,
+
+[Manufacturer]
+%ManufacturerName% = imxecompass_Device, NT$ARCH$.10.0...19041
+
+
+;*******************************
+; imxecompass Install Section
+;*******************************
+
+[imxecompass_Device.NT$ARCH$.10.0...19041]
+; DisplayName       Section          DeviceId
+; -----------       -------          --------
+%imxecompass_DevDesc% = imxecompass_Inst, ACPI\NXP0870
+
+[imxecompass_Inst.NT]
+CopyFiles = imxecompassDriverCopy
+
+[imxecompass_Inst.NT.hw]
+
+[imxecompassDriverCopy]
+imxecompass.dll
+
+;-------------- Service installation
+
+[imxecompass_Inst.NT.Services]
+AddService = WUDFRd,0x000001fa,WUDFRD_ServiceInstall
+
+[WUDFRD_ServiceInstall]
+DisplayName   = %WudfRdDisplayName%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\WUDFRd.sys
+
+;-------------- WDF specific section
+
+[imxecompass_Inst.NT.Wdf]
+UmdfService              = imxecompass, imxecompass_Install
+UmdfServiceOrder         = imxecompass
+UmdfDirectHardwareAccess = AllowDirectHardwareAccess
+UmdfFileObjectPolicy     = AllowNullAndUnknownFileObjects
+UmdfFsContextUsePolicy   = CannotUseFsContexts
+
+[imxecompass_Install]
+UmdfLibraryVersion       = $UMDFVERSION$
+ServiceBinary            = %12%\UMDF\imxecompass.dll
+UmdfExtensions           = SensorsCx0102
+
+[Strings]
+;Localizable Strings
+MediaDescription         = "Accelerometer and Magnetometer sensor"
+ProviderName             = "NXP Semiconductors"
+ManufacturerName         = "NXP Semiconductors"
+imxecompass_DevDesc      = "e-Compass Sensor"
+WudfRdDisplayName        = "Windows Driver Foundation - User-mode Driver Framework Reflector"
+
+;Non-Localizable Strings
+SERVICE_KERNEL_DRIVER    = 1
+SERVICE_DEMAND_START     = 3
+SERVICE_ERROR_NORMAL     = 1

@@ -1,0 +1,6 @@
+; imxgyro_fxas21002.def : Declares the module parameters.
+
+LIBRARY imxgyro_fxas21002
+
+EXPORTS
+

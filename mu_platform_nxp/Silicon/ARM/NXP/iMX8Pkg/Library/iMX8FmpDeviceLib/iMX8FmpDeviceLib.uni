@@ -1,0 +1,14 @@
+// /** @file
+// Provides firmware device specific services to support updates of a firmware
+// image stored in a firmware device.
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright 2022 NXP.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Provides firmware device specific services to support updates of a firmware image stored in a iMX8 firmware device."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides firmware device specific services to support updates of a firmware image stored in a iMX8 firmware device."

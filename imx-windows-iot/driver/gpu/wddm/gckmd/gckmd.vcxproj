@@ -1,0 +1,196 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Emulator\GcKmd7LEmuMmu.cpp" />
+    <ClCompile Include="Emulator\GcKmdEmuAdapter.cpp" />
+    <ClCompile Include="Emulator\GcKmdEmuEngine.cpp" />
+    <ClCompile Include="Emulator\GcKmdEmuNode.cpp" />
+    <ClCompile Include="GcKmd7LContext.cpp" />
+    <ClCompile Include="GcKmd7LDevice.cpp" />
+    <ClCompile Include="GcKmd7LGlobal.cpp" />
+    <ClCompile Include="GcKmd7LPower.cpp" />
+    <ClCompile Include="GcKmd7LEngine.cpp" />
+    <ClCompile Include="GcKmd7LMmuCommon.cpp" />
+    <ClCompile Include="GcKmd7LNode.cpp" />
+    <ClCompile Include="GcKmd7LAdapter.cpp" />
+    <ClCompile Include="GcKmd7LMmu.cpp" />
+    <ClCompile Include="GcKmd7LProcess.cpp" />
+    <ClCompile Include="GcKmd7LUtil.cpp" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\AllocationExchangeData.h" />
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\gcdispif.h" />
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\GcKmdAllocation.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\AdapterExchangeData.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\ContextExchangeData.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmd.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdAdapter.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdContext.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdDdi.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdDevice.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdGlobal.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdLogging.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdProcess.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdResource.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdSwQueueNode.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdUtil.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\GcLogging.h" />
+    <ClInclude Include="..\..\..\wddmfw\include\SubmissionExchangeData.h" />
+    <ClInclude Include="..\gccommon\Gc7LCmdBufPatch.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompAB.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompBB.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompCF.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompCTB.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompSB.h" />
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompTB.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompAB.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompBB.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompCF.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompCTB.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompTB.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCopyBuf.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCopyImg.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdFillBuf.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdFillImg.h" />
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompSB.h" />
+    <ClInclude Include="..\gccommon\Gc7LGdiOpParams.h" />
+    <ClInclude Include="..\gccommon\Gc7LMmu.h" />
+    <ClInclude Include="..\gccommon\Gc7LTexDesc.h" />
+    <ClInclude Include="..\gccommon\GcCommandBuffer.h" />
+    <ClInclude Include="..\gccommon\GcHw.h" />
+    <ClInclude Include="Emulator\GcKmd7LEmuMmu.h" />
+    <ClInclude Include="Emulator\GcKmdEmuAdapter.h" />
+    <ClInclude Include="Emulator\GcKmdEmuEngine.h" />
+    <ClInclude Include="Emulator\GcKmdEmuNode.h" />
+    <ClInclude Include="Gc7LCmdGdiOp.h" />
+    <ClInclude Include="Gc7LCmdGdiOpData.h" />
+    <ClInclude Include="GcKmd7L.h" />
+    <ClInclude Include="GcKmd7LAdapter.h" />
+    <ClInclude Include="GcKmd7LContext.h" />
+    <ClInclude Include="GcKmd7LDevice.h" />
+    <ClInclude Include="GcKmd7LEngine.h" />
+    <ClInclude Include="GcKmd7LMmu.h" />
+    <ClInclude Include="GcKmd7LMmuCommon.h" />
+    <ClInclude Include="GcKmd7LNode.h" />
+    <ClInclude Include="GcKmd7LProcess.h" />
+    <ClInclude Include="GcKmd7LUtil.h" />
+    <ClInclude Include="precomp.h" />
+  </ItemGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DF1841DE-2CA5-4A13-93BF-9583C10CB071}</ProjectGuid>
+    <TemplateGuid>{0a049372-4c4d-4ea0-a64e-dc6ad88ceca1}</TemplateGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration>IMX8M</Configuration>
+    <RootNamespace>gckmd</RootNamespace>
+    <DriverType>KMDF</DriverType>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Driver_SpectreMitigation>Spectre</Driver_SpectreMitigation>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Build\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(Platform)\$(ConfigurationName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;WINAPI_PARTITION_DESKTOP=1;WINAPI_PARTITION_SYSTEM=1;WINAPI_PARTITION_APP=1;WINAPI_PARTITION_PC_APP=1;VIV_KMD;__KERNEL__;NO_DMA_COHERENT=1;LINUX_CMA_FSL=1;gcdFSL_CONTIGUOUS_SIZE=0x10000000;gcdDEFAULT_CONTIGUOUS_SIZE=~0ULL;MSDX=1;DXGKDDI_INTERFACE_VERSION=DXGKDDI_INTERFACE_VERSION_WDDM2_6;%(PreprocessorDefinitions);_NO_CRT_STDIO_INLINE</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories);$(SolutionDir)..\..\..\driver\wddmfw\gcdispif;$(SolutionDir)..\..\..\driver\wddmfw\include;$(SolutionDir)..\..\..\driver\gpu\wddm\gccommon;$(SolutionDir)..\..\..\driver\gpu\wddm\gckmd;$(SolutionDir)..\..\..\driver\gpu\wddm\gckmd\\emulator;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\inc;$(SolutionDir)..\..\..\driver\gpu\wcos\kernel;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\kernel;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\kernel\arch;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\security_v1;$(SolutionDir)..\..\..\driver\gpu\common;$(SDK_INC_PATH)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4064;4627;4627;4366;4100;4996;4189;4456;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <WppEnabled>true</WppEnabled>
+      <WppPreprocessorDefinitions>ENABLE_WPP_RECORDER=1;WPP_EMIT_FUNC_NAME</WppPreprocessorDefinitions>
+      <WppRecorderEnabled>true</WppRecorderEnabled>
+      <WppScanConfigurationData>..\gccommon\GcLogging.h</WppScanConfigurationData>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>dispdll.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>..\gcdisplib\$(Configuration)\$(Platform)</AdditionalLibraryDirectories>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies>dispdll.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>..\gcdisplib\$(Configuration)\$(Platform)</AdditionalLibraryDirectories>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies>dispdll.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>..\gcdisplib\$(Configuration)\$(Platform)</AdditionalLibraryDirectories>
+    </Lib>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;WINAPI_PARTITION_DESKTOP=1;WINAPI_PARTITION_SYSTEM=1;WINAPI_PARTITION_APP=1;WINAPI_PARTITION_PC_APP=1;VIV_KMD;__KERNEL__;NO_DMA_COHERENT=1;LINUX_CMA_FSL=1;gcdFSL_CONTIGUOUS_SIZE=0x10000000;gcdDEFAULT_CONTIGUOUS_SIZE=~0ULL;MSDX=1;DXGKDDI_INTERFACE_VERSION=DXGKDDI_INTERFACE_VERSION_WDDM2_6;%(PreprocessorDefinitions);_NO_CRT_STDIO_INLINE</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories);$(SolutionDir)..\..\..\driver\wddmfw\gcdispif;$(SolutionDir)..\..\..\driver\wddmfw\include;$(SolutionDir)..\..\..\driver\gpu\wddm\gccommon;$(SolutionDir)..\..\..\driver\gpu\wddm\gckmd;$(SolutionDir)..\..\..\driver\gpu\wddm\gckmd\\emulator;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\inc;$(SolutionDir)..\..\..\driver\gpu\wcos\kernel;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\kernel;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\kernel\arch;$(SolutionDir)..\..\..\driver\gpu\verisilicon-gal\hal\security_v1;$(SolutionDir)..\..\..\driver\gpu\common;$(SDK_INC_PATH)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4064;4627;4627;4366;4100;4996;4189;4456;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <WppEnabled>true</WppEnabled>
+      <WppPreprocessorDefinitions>ENABLE_WPP_RECORDER=1;WPP_EMIT_FUNC_NAME</WppPreprocessorDefinitions>
+      <WppRecorderEnabled>true</WppRecorderEnabled>
+      <WppScanConfigurationData>..\gccommon\GcLogging.h</WppScanConfigurationData>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>precomp.h</PrecompiledHeaderFile>
+      <Optimization>Full</Optimization>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

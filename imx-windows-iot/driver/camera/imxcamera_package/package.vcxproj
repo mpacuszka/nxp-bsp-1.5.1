@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\imxcamera\imxcamera.vcxproj">
+      <Project>{77fa53ec-3637-411c-b708-c8eed64543a4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxcsi\imxcsi.vcxproj">
+      <Project>{4225be17-fefe-4616-b7cb-ee934922c109}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxisi\imxisi.vcxproj">
+      <Project>{3fbf6c1d-4331-4f10-a0b3-cd2ef68556e1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxmipi\imxmipi.vcxproj">
+      <Project>{8ec89fe7-9e34-4a72-89bd-27e24eb8c546}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxmipi_csi2_dwc\imxmipi_csi2_dwc.vcxproj">
+      <Project>{3c5bc73e-6dc4-4386-a2c9-735db5fddeb1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxmipi_csis\imxmipi_csis.vcxproj">
+      <Project>{d31d854d-8126-4ce7-8fa1-9181d6daa9a8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxsns_ov10635\imxsns_ov10635.vcxproj">
+      <Project>{83d555db-4da5-4ea8-821a-3ae58d1879d8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxsns_ov5640\imxsns_ov5640.vcxproj">
+      <Project>{9e1b1bba-0034-476d-9952-668d06ecbb02}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\imxsns_x_rpi_cam_mipi\imxsns_x_rpi_cam_mipi.vcxproj">
+      <Project>{bdc3a5f6-47d5-4a87-bb16-bd539fff0023}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="imxcamera_package.inf" />
+  </ItemGroup>
+  <PropertyGroup Label="PropertySheets">
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Utility</ConfigurationType>
+    <DriverType>Package</DriverType>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <Configuration>Debug</Configuration>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{30FFB863-CECC-4E27-85F1-8DAC2256FC2F}</ProjectGuid>
+    <SampleGuid>{198A87DB-8A25-471F-971B-7F131503ADBA}</SampleGuid>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <ProjectName>imxcamera_package</ProjectName>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\..\build\common.props" />
+  </ImportGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup>
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <ImportToStore>False</ImportToStore>
+    <InstallMode>None</InstallMode>
+    <HardwareIdString />
+    <CommandLine />
+    <ScriptPath />
+    <DeployFiles />
+    <ScriptName />
+    <ScriptDeviceQuery>%PathToInf%</ScriptDeviceQuery>
+    <EnableVerifier>False</EnableVerifier>
+    <AllDrivers>False</AllDrivers>
+    <VerifyProjectOutput>True</VerifyProjectOutput>
+    <VerifyDrivers />
+    <VerifyFlags>133563</VerifyFlags>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

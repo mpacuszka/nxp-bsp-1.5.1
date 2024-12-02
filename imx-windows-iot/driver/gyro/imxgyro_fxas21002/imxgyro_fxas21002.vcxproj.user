@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <TestCertificate>CN=NXP Win BSP Test Cert 2022 (TEST ONLY) | 749E4CC65EE7B3E1CFF5E51B9EEC5560225A44D7</TestCertificate>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <TestCertificate>CN=NXP Win BSP Test Cert 2022 (TEST ONLY) | 749E4CC65EE7B3E1CFF5E51B9EEC5560225A44D7</TestCertificate>
+  </PropertyGroup>
+</Project>

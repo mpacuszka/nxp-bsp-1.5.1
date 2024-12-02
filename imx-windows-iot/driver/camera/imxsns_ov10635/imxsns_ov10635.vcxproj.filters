@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="..\..\shared\acpi\acpiutil.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\OperatorNew.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\WdfIoTargets.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="ov10635\ImxOv10635.cpp" />
+    <ClCompile Include="..\..\shared\acpi\dsdtutil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Driver.h" />
+    <ClInclude Include="Public.h" />
+    <ClInclude Include="Trace.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ov10635\ImxCameraInterface.h" />
+    <ClInclude Include="ov10635\ImxOv10635.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="imxsns_ov10635.inf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="utils">
+      <UniqueIdentifier>{cbb39125-b841-4367-9a0b-0efdc820d23b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hardware">
+      <UniqueIdentifier>{c74d2d25-8ca0-4132-ae85-910fbf55e99a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+</Project>

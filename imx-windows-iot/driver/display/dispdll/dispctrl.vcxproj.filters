@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Driver Files">
+      <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
+      <Extensions>inf;inv;inx;mof;mc;</Extensions>
+    </Filter>
+    <Filter Include="Header Files\linux">
+      <UniqueIdentifier>{87f8db62-b021-44cc-a94f-a007ce2fcbd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\asm">
+      <UniqueIdentifier>{7a0690d9-c734-458c-bdce-945ea9faf30e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\kernel">
+      <UniqueIdentifier>{6e2325c3-94e4-4b40-ac30-3e11dbd76f7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\drm">
+      <UniqueIdentifier>{fb1424d2-ce84-4790-84ec-905f9b21ba94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dcss">
+      <UniqueIdentifier>{c08c05ea-f86e-48e3-b7eb-180095b12b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\drm\bridge">
+      <UniqueIdentifier>{b6ed2538-a8ec-4beb-9f1a-12ad4516a114}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mhdp">
+      <UniqueIdentifier>{759b97e7-4580-49bf-a927-07142cf692e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bridge">
+      <UniqueIdentifier>{d69169bd-565f-4bf7-8860-163ff0499097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bridge\cadence">
+      <UniqueIdentifier>{e26f6618-5b06-4d78-a43d-4b31f5bbaf3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dcss">
+      <UniqueIdentifier>{75afcbf4-504d-4a38-a503-60ba160f4e2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bridge">
+      <UniqueIdentifier>{92fd9a8f-0bb4-42a0-890b-e6ad1dc02e7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bridge\cadence">
+      <UniqueIdentifier>{0bf06fa8-3bd4-4224-8d30-1879677ec87d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\linux\unaligned">
+      <UniqueIdentifier>{e490db7d-d9ce-46e0-9016-9c12a2d7dfde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\video">
+      <UniqueIdentifier>{6cae7706-7086-4f1d-9da3-270c12072620}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\drm">
+      <UniqueIdentifier>{37cc1ed6-27c0-4e68-afc5-bc71f28bdd89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\clk">
+      <UniqueIdentifier>{691509b8-f39f-43f0-9e0c-0a0121a1a094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lvds">
+      <UniqueIdentifier>{9c44955e-b900-4736-9788-fcb9181b06b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mipi_dsi">
+      <UniqueIdentifier>{c888586e-fcf6-489b-9eab-1dc41687c643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lcdif">
+      <UniqueIdentifier>{408e4736-8eb1-428b-ab40-1e5810e33ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lcdifv3">
+      <UniqueIdentifier>{7b136dc6-bb8c-49f0-81f3-cc9edc3b721c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\clk">
+      <UniqueIdentifier>{da93e08a-38b9-4f41-8fbb-adf490ea3d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lvds">
+      <UniqueIdentifier>{a696bf70-3478-41d2-8827-d15b1cfffaec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mipi_dsi">
+      <UniqueIdentifier>{a4e6f0cd-3bfd-4bb8-9dc1-3ddd85a119c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lcdif">
+      <UniqueIdentifier>{83a79a3b-d434-45b6-9a59-1ed43614d300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lcdifv3">
+      <UniqueIdentifier>{b5ab5204-e777-401b-9ea9-e01fbd86561f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bridge\synopsys">
+      <UniqueIdentifier>{3c975df8-a8ab-4ba3-8b85-4fa6ad67db70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bridge\synopsys">
+      <UniqueIdentifier>{2d39f1da-8770-464a-b55e-3d2450759fca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dpu">
+      <UniqueIdentifier>{acd1d10d-3f44-4486-83d1-a01dfef3ac99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dpu">
+      <UniqueIdentifier>{52c00a81-988d-4782-a9eb-4875d8b8423d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\video">
+      <UniqueIdentifier>{7a4a4103-d3de-4e43-8c18-d6732561324f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\dt-bindings">
+      <UniqueIdentifier>{b2f05cca-1f03-4417-b3c6-29d6f5d3a634}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\base">
+      <UniqueIdentifier>{895c5418-84c8-4425-8b53-ef72ab3fa7e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\asm-generic">
+      <UniqueIdentifier>{72cf5c76-66e7-4fbd-a119-8971024b1bf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{a51e2268-aef9-4a4c-a648-cbfa1b3902b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scfw">
+      <UniqueIdentifier>{e421b127-972b-496e-8c97-eae3c495145f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\firmware">
+      <UniqueIdentifier>{fc724de2-297a-4e34-9295-6d58ebf3a21c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\drm\bridge">
+      <UniqueIdentifier>{296ecadf-b63c-46b7-99a6-bbdc9d74cfd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\phy">
+      <UniqueIdentifier>{646c0477-0068-48f5-8a55-20c71b41df0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\phy">
+      <UniqueIdentifier>{215741f4-a48c-4842-bf5b-ed8b32b88625}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dispctrl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdHdmiTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdLogging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdVidPnMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="precomp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util\src\edidparser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\linuxsup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\board-imx8mq.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\kernel\irq\chip.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\irqchip\irq-imx-irqsteer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\kernel\irq\manage.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdBaseDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mqDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mpDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdMpLvdsTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdifv3\lcdifv3-common.c">
+      <Filter>Source Files\lcdifv3</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\board-imx8mp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdifv3\lcdifv3-crtc.c">
+      <Filter>Source Files\lcdifv3</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdifv3\lcdifv3-plane.c">
+      <Filter>Source Files\lcdifv3</Filter>
+    </ClCompile>
+    <ClCompile Include="lvds\imx8mp-ldb.c">
+      <Filter>Source Files\lvds</Filter>
+    </ClCompile>
+    <ClCompile Include="lvds\phy-fsl-imx8mp-lvds.c">
+      <Filter>Source Files\lvds</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-blkctl.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-ctxld.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-dec400d.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-dev.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-dpr.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-dtg.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-dtrc.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-hdr10.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-rdsrc.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-scaler.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-ss.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-wrscl.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-crtc.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-kms.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="dcss\dcss-plane.c">
+      <Filter>Source Files\dcss</Filter>
+    </ClCompile>
+    <ClCompile Include="mhdp\cdns-mhdp-imxdrv.c">
+      <Filter>Source Files\mhdp</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\cadence\cdns-hdmi-core.c">
+      <Filter>Source Files\bridge\cadence</Filter>
+    </ClCompile>
+    <ClCompile Include="mhdp\cdns-mhdp-hdmi-phy.c">
+      <Filter>Source Files\mhdp</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\cadence\cdns-mhdp-common.c">
+      <Filter>Source Files\bridge\cadence</Filter>
+    </ClCompile>
+    <ClCompile Include="video\hdmi.c">
+      <Filter>Source Files\video</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_edid.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_fourcc.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_modes.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\cadence\cdns-mhdp-hdmi.c">
+      <Filter>Source Files\mhdp</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8m.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8mp.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\mediamix_mp.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8mq.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="lvds\it6263.c">
+      <Filter>Source Files\lvds</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mnDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdSecDsiTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdif\lcdif-common.c">
+      <Filter>Source Files\lcdif</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\board-imx8mn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdif\lcdif-crtc.c">
+      <Filter>Source Files\lcdif</Filter>
+    </ClCompile>
+    <ClCompile Include="lcdif\lcdif-plane.c">
+      <Filter>Source Files\lcdif</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\sec_mipi_dsim-imx.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\displaymix_mn.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\sec-dsim.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_panel.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\drm_mipi_dsi.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8mn.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\adv7511_drv.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\adv7533.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="util\src\getresrc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\synopsys\dw_hdmi-imx.c">
+      <Filter>Source Files\bridge\synopsys</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\synopsys\imx8mp-hdmi-pavi.c">
+      <Filter>Source Files\bridge\synopsys</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\synopsys\phy-fsl-samsung-hdmi.c">
+      <Filter>Source Files\bridge\synopsys</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_connector.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\i2c\i2c-core-base.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_displayid.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\drm_scdc_helper.c">
+      <Filter>Source Files\drm</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\synopsys\dw-hdmi.c">
+      <Filter>Source Files\bridge\synopsys</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdDwHdmiTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mpHdmiDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8qxpDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8qxp.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-common.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\board-imx8qxp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdQxpLvdsTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-sc-misc.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-constframe.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-disengcfg.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-extdst.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-fetchdecode.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-fetchunit.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-fetcheco.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-fetchwarp.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-fetchlayer.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-framegen.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-hscaler.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-vscaler.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-layerblend.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-signature.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-store.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-tcon.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\base\platform.c">
+      <Filter>Source Files\base</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-crtc.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-plane.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\dpu-kms.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\lib\find_bit.c">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\imx8_dprc.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="clk\clk_imx8q.c">
+      <Filter>Source Files\clk</Filter>
+    </ClCompile>
+    <ClCompile Include="dpu\imx8_prg.c">
+      <Filter>Source Files\dpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\scfw\main\ipc.c">
+      <Filter>Source Files\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\scfw\svc\pm\pm_rpc_clnt.c">
+      <Filter>Source Files\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\firmware\imx\imx-scu.c">
+      <Filter>Source Files\firmware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\scfw\svc\misc\misc_rpc_clnt.c">
+      <Filter>Source Files\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="lvds\imx8qxp-ldb.c">
+      <Filter>Source Files\lvds</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\drm\bridge\fsl-imx-ldb.c">
+      <Filter>Source Files\drm\bridge</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\drivers\phy\phy-mixel-lvds-combo.c">
+      <Filter>Source Files\phy</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\panel-raydium-rm67191.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="os\windows\src\comm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bridge\synopsys\dw-hdmi-gp-audio.c">
+      <Filter>Source Files\bridge\synopsys</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdBaseDisplayController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mpDisplayController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8qxpDisplayController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8mpMipiDsiDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\nwl-dsi.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\phy-fsl-imx8-mipi-dphy.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="mipi_dsi\phy-core-mipi-dphy.c">
+      <Filter>Source Files\mipi_dsi</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdNwlDsiTransmitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmdImx8qxpMipiDsiDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GcKmd7LIO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdErroHandling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdGlobal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdHdmiTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdHdpOpcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdLogging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcLogging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="precomp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\video\display_timing.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\video\videomode.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\types.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\vdso\bits.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="util\src\edid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\include\edidparser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\slab.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\gfp.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\platform_device.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\device.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\of.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\arch\alpha\include\uapi\asm\errno.h">
+      <Filter>Header Files\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\compiler.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\clk.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\err.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\build_bug.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\kernel.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\irqdesc.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\interrupt.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\irqchip\irq-imx-irqsteer.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\irq.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\src\kernel\irq\internals.h">
+      <Filter>Header Files\kernel</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\ioport.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\arch\arm64\include\asm\io.h">
+      <Filter>Header Files\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\sizes.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\dev_printk.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\spinlock_types.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\spinlock.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mqDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdBaseDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdBaseTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mpDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdMpLvdsTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bug.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\io.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdifv3\imx-lcdifv3.h">
+      <Filter>Header Files\lcdifv3</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\dma-mapping.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\atomic.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\jiffies.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\delay.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdifv3\lcdifv3-regs.h">
+      <Filter>Header Files\lcdifv3</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdifv3\lcdifv3-plane.h">
+      <Filter>Header Files\lcdifv3</Filter>
+    </ClInclude>
+    <ClInclude Include="lvds\imx8mp-ldb.h">
+      <Filter>Header Files\lvds</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\mod_devicetable.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\of_device.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\uapi\drm\drm_fourcc.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\uapi\linux\media-bus-format.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\lockdep.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_fourcc.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\uapi\drm\drm_mode.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_plane.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_rect.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\bsearch.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_modes.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\completion.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_connector.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_edid.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_crtc.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\bridge\cdns-mhdp.h">
+      <Filter>Header Files\drm\bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_framebuffer.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_color_mgmt.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_print.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_atomic_helper.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_encoder.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\mutex.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_bridge.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="dcss\dcss-dev.h">
+      <Filter>Header Files\dcss</Filter>
+    </ClInclude>
+    <ClInclude Include="dcss\dcss-kms.h">
+      <Filter>Header Files\dcss</Filter>
+    </ClInclude>
+    <ClInclude Include="dcss\dcss-hdr10-tables.h">
+      <Filter>Header Files\dcss</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge\cadence\cdns-mhdp-hdcp.h">
+      <Filter>Header Files\bridge\cadence</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge\cadence\cdns-mhdp.h">
+      <Filter>Header Files\bridge\cadence</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\ktime.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\unaligned\be_byteshift.h">
+      <Filter>Header Files\linux\unaligned</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\div64.h">
+      <Filter>Header Files\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\math64.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_scdc_helper.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\hdmi.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_property.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\bitops.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bitops\non-atomic.h">
+      <Filter>Header Files\asm</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\clk-provider.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8m.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8mp.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\mediamix_mp.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\i2c.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\regmap.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="lvds\it6263.h">
+      <Filter>Header Files\lvds</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mnDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdSecDsiTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdif\imx-lcdif.h">
+      <Filter>Header Files\lcdif</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdif\lcdif-regs.h">
+      <Filter>Header Files\lcdif</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\iopoll.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\printk.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="lcdif\lcdif-plane.h">
+      <Filter>Header Files\lcdif</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\sec_mipi_dphy_ln14lpp.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\sec_mipi_dsim.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\sec_mipi_pll_1432x.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\displaymix_mn.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_panel.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\drm_mipi_dsi.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8mn.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\adv7511.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8mq.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\mipi_display.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="util\include\getresrc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge\synopsys\dw_hdmi.h">
+      <Filter>Header Files\bridge\synopsys</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge\synopsys\imx8mp-hdmi-pavi.h">
+      <Filter>Header Files\bridge\synopsys</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_displayid.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdDwHdmiTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mpHdmiDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bridge\synopsys\dw-hdmi.h">
+      <Filter>Header Files\bridge\synopsys</Filter>
+    </ClInclude>
+    <ClInclude Include="dpu\dpu-prv.h">
+      <Filter>Header Files\dpu</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\video\dpu.h">
+      <Filter>Header Files\video</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\dt-bindings\firmware\imx\rsrc.h">
+      <Filter>Header Files\dt-bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\drm_blend.h">
+      <Filter>Header Files\drm</Filter>
+    </ClInclude>
+    <ClInclude Include="dpu\dpu-crtc.h">
+      <Filter>Header Files\dpu</Filter>
+    </ClInclude>
+    <ClInclude Include="dpu\dpu-crc.h">
+      <Filter>Header Files\dpu</Filter>
+    </ClInclude>
+    <ClInclude Include="dpu\dpu-plane.h">
+      <Filter>Header Files\dpu</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bitops.h">
+      <Filter>Header Files\asm-generic</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bitops\find.h">
+      <Filter>Header Files\asm-generic</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bitops\ffs.h">
+      <Filter>Header Files\asm-generic</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\bitmap.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8qxp.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8qxp_lpcg.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8m_registers.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8q.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8m_pll.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="clk\clk_imx8.h">
+      <Filter>Header Files\clk</Filter>
+    </ClInclude>
+    <ClInclude Include="lvds\imx8qxp-ldb.h">
+      <Filter>Header Files\lvds</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\phy\phy.h">
+      <Filter>Header Files\phy</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\phy\phy-mixel-lvds-combo.h">
+      <Filter>Header Files\phy</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\asm-generic\bitops\__ffs.h">
+      <Filter>Header Files\asm-generic</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\drm\bridge\fsl_imx_ldb.h">
+      <Filter>Header Files\drm\bridge</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\pm_domain.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\preempt.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdQxpLvdsTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8qxpDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\panel-raydium-rm67191.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\gpio\consumer.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\src\comm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdBaseDisplayController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mpDisplayController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8Display.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8qxpDisplayController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8mpMipiDsiDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mipi_dsi\nwl-dsi.h">
+      <Filter>Header Files\mipi_dsi</Filter>
+    </ClInclude>
+    <ClInclude Include="os\windows\include\linux\include\linux\align.h">
+      <Filter>Header Files\linux</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdNwlDsiTransmitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmdImx8qxpMipiDsiDisplay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,6 @@
+LIBRARY dispctrl
+EXPORTS
+  DllInitialize PRIVATE
+  DllUnload PRIVATE
+  DisplayStartController
+  DisplayStopController

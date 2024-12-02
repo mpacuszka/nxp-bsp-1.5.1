@@ -1,0 +1,477 @@
+diff --git a/iMX8M/mkimage_fit_atf.sh b/iMX8M/mkimage_fit_atf.sh
+index b0a9045..d3bfea3 100755
+--- a/iMX8M/mkimage_fit_atf.sh
++++ b/iMX8M/mkimage_fit_atf.sh
+@@ -10,6 +10,8 @@
+ # keep backward compatibility
+ [ -z "$TEE_LOAD_ADDR" ] && TEE_LOAD_ADDR="0xfe000000"
+ 
++[ -z "$UEFI" ] && UEFI="uefi.fit"
++
+ if [ -z "$ATF_LOAD_ADDR" ]; then
+ 	echo "ERROR: BL31 load address is not set" >&2
+ 	exit 0
+@@ -23,8 +25,22 @@ else
+ 	ls -lct $BL31 | awk '{print $5}' >&2
+ fi
+ 
++# Check if the UEFI file exists
++if [ ! -f $UEFI ]; then
++	echo "ERROR: UEFI file $UEFI NOT found" >&2
++	exit 0
++else
++	echo "UEFI size: " >&2
++	ls -lct $UEFI  | awk '{print $5}' >&2
++fi
++# Check if the UEFI load address is specified
++if [ -z "$UEFI_FIT_LOAD_ADDR" ]; then
++	echo "ERROR: UEFI-FIT load address is not set" >&2
++	exit 0
++fi
++
+ [ -z "$BL32" ] && BL32="tee.bin"
+-LOADABLES="\"atf-1\""
++LOADABLES="\"atf-1\", \"uefi-fit\""
+ 
+ PAD=../scripts/pad_image.sh
+ 
+@@ -139,6 +155,15 @@ cat << __HEADER_EOF
+ __HEADER_EOF
+ fi
+ 
++cat << __HEADER_EOF
++		uefi-fit {
++			description = "UEFI-FIT";
++			data = /incbin/("$UEFI");
++			compression = "none";
++			load = <$UEFI_FIT_LOAD_ADDR>;
++		};
++__HEADER_EOF
++
+ cat << __CONF_HEADER_EOF
+ 	};
+ 	configurations {
+diff --git a/iMX8M/mkimage_imx8.c b/iMX8M/mkimage_imx8.c
+index 5d5343b..0c2a388 100644
+--- a/iMX8M/mkimage_imx8.c
++++ b/iMX8M/mkimage_imx8.c
+@@ -326,6 +326,9 @@ copy_file (int ifd, const char *datafile, int pad, int offset, int datafile_offs
+ 	}
+ 
+ 	size = sbuf.st_size - datafile_offset;
++        if (size < 0) {
++		exit (EXIT_FAILURE);
++        }
+ 	ret = lseek(ifd, offset, SEEK_SET);
+ 	if (ret < 0) {
+ 		fprintf(stderr, "%s: lseek error %s\n",
+diff --git a/iMX8M/print_fit_hab.sh b/iMX8M/print_fit_hab.sh
+index 06fca5f..4caa0dc 100755
+--- a/iMX8M/print_fit_hab.sh
++++ b/iMX8M/print_fit_hab.sh
+@@ -97,3 +97,13 @@ if [ ${tee_size} != 0x0 ]
+ then
+ 	echo ${tee_load_addr} ${tee_sign_off} ${tee_size}
+ fi
++
++let uefi_fit_sign_off=$((tee_sign_off+tee_size))
++let uefi_fit_load_addr=$UEFI_FIT_LOAD_ADDR
++let uefi_fit_size=$(ls -lct uefi.fit | awk '{print $5}')
++
++uefi_fit_size=`printf "0x%X" ${uefi_fit_size}`
++uefi_fit_sign_off=`printf "0x%X" ${uefi_fit_sign_off}`
++uefi_fit_load_addr=`printf "0x%X" ${uefi_fit_load_addr}`
++
++echo ${uefi_fit_load_addr} ${uefi_fit_sign_off} ${uefi_fit_size}
+\ No newline at end of file
+diff --git a/iMX8M/soc.mak b/iMX8M/soc.mak
+index baf687e..af9fb61 100644
+--- a/iMX8M/soc.mak
++++ b/iMX8M/soc.mak
+@@ -36,6 +36,7 @@ SPL_LOAD_ADDR = 0x7E1000
+ SPL_FSPI_LOAD_ADDR = 0x7E2000
+ TEE_LOAD_ADDR ?= 0xbe000000
+ ATF_LOAD_ADDR = 0x00920000
++UEFI_FIT_LOAD_ADDR = 0x40480000
+ VAL_BOARD = val
+ #define the F(Q)SPI header file
+ QSPI_HEADER = ../scripts/fspi_header 0
+@@ -47,8 +48,9 @@ PLAT = imx8mn
+ HDMI = no
+ SPL_LOAD_ADDR = 0x912000
+ SPL_FSPI_LOAD_ADDR = 0x912000
+-TEE_LOAD_ADDR = 0x56000000
++TEE_LOAD_ADDR = 0xbe000000
+ ATF_LOAD_ADDR = 0x00960000
++UEFI_FIT_LOAD_ADDR = 0x40480000
+ VAL_BOARD = val
+ #define the F(Q)SPI header file
+ QSPI_HEADER = ../scripts/fspi_header
+@@ -61,8 +63,9 @@ PLAT = imx8mp
+ HDMI = no
+ SPL_LOAD_ADDR = 0x920000
+ SPL_FSPI_LOAD_ADDR = 0x920000
+-TEE_LOAD_ADDR =  0x56000000
++TEE_LOAD_ADDR =  0xfe000000
+ ATF_LOAD_ADDR = 0x00970000
++UEFI_FIT_LOAD_ADDR = 0x40480000
+ VAL_BOARD = val
+ #define the F(Q)SPI header file
+ QSPI_HEADER = ../scripts/fspi_header
+@@ -77,6 +80,7 @@ HDMI = yes
+ SPL_LOAD_ADDR = 0x7E1000
+ TEE_LOAD_ADDR = 0xfe000000
+ ATF_LOAD_ADDR = 0x00910000
++UEFI_FIT_LOAD_ADDR = 0x40480000
+ VAL_BOARD = val
+ #define the F(Q)SPI header file
+ QSPI_HEADER = ../scripts/qspi_header
+@@ -159,7 +163,7 @@ u-boot.itb: $(dtb) $(supp_dtbs)
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb) $(supp_dtbs)
+-	BL32=$(TEE) DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb) $(supp_dtbs) > u-boot.its
++	BL32=$(TEE) DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb) $(supp_dtbs) > u-boot.its
+ 	./mkimage_uboot -E -p $(FIT_EXTERNAL_POSITION) -f u-boot.its u-boot.itb
+ 	@rm -f u-boot.its $(dtb)
+ 
+@@ -171,7 +175,7 @@ u-boot-ddr3l.itb: $(dtb_ddr3l) $(supp_dtbs)
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb_ddr3l) $(supp_dtbs)
+-	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr3l) $(supp_dtbs) > u-boot-ddr3l.its
++	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr3l) $(supp_dtbs) > u-boot-ddr3l.its
+ 	./mkimage_uboot -E -p $(FIT_EXTERNAL_POSITION) -f u-boot-ddr3l.its u-boot-ddr3l.itb
+ 	@rm -f u-boot.its $(dtb_ddr3l)
+ 
+@@ -195,7 +199,7 @@ u-boot-ddr4.itb: $(dtb_ddr4) $(supp_dtbs)
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb_ddr4) $(supp_dtbs)
+-	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr4) $(supp_dtbs) > u-boot-ddr4.its
++	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr4) $(supp_dtbs) > u-boot-ddr4.its
+ 	./mkimage_uboot -E -p $(FIT_EXTERNAL_POSITION) -f u-boot-ddr4.its u-boot-ddr4.itb
+ 	@rm -f u-boot.its $(dtb_ddr4)
+ 
+@@ -207,7 +211,7 @@ u-boot-ddr4-evk.itb: $(dtb_ddr4_evk) $(supp_dtbs)
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb_ddr4_evk) $(supp_dtbs)
+-	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr4_evk) $(supp_dtbs) > u-boot-ddr4-evk.its
++	DEK_BLOB_LOAD_ADDR=$(DEK_BLOB_LOAD_ADDR) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) ../$(SOC_DIR)/mkimage_fit_atf.sh $(dtb_ddr4_evk) $(supp_dtbs) > u-boot-ddr4-evk.its
+ 	./mkimage_uboot -E -p $(FIT_EXTERNAL_POSITION) -f u-boot-ddr4-evk.its u-boot-ddr4-evk.itb
+ 	@rm -f u-boot.its $(dtb_ddr4_evk)
+ 
+@@ -324,25 +328,25 @@ flash_dp_spl_uboot: flash_dp_evk
+ 
+ flash_spl_uboot: flash_evk_no_hdmi
+ 
+-print_fit_hab: u-boot-nodtb.bin bl31.bin $(dtb) $(supp_dtbs)
++print_fit_hab: u-boot-nodtb.bin bl31.bin $(dtb) uefi.fit $(supp_dtbs)
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb) $(supp_dtbs)
+-	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) VERSION=$(VERSION) ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb) $(supp_dtbs)
++	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) VERSION=$(VERSION) ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb) $(supp_dtbs)
+ 	@rm -f $(dtb)
+ 
+-print_fit_hab_ddr4: u-boot-nodtb.bin bl31.bin $(dtb_ddr4_evk) $(supp_dtbs)
++print_fit_hab_ddr4: u-boot-nodtb.bin bl31.bin $(dtb_ddr4_evk) $(supp_dtbs) uefi.fit
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb_ddr4_evk) $(supp_dtbs)
+-	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) VERSION=$(VERSION) ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb_ddr4_evk) $(supp_dtbs)
++	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) VERSION=$(VERSION) ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb_ddr4_evk) $(supp_dtbs)
+ 	@rm -f $(dtb_ddr4_evk)
+ 
+-print_fit_hab_flexspi: u-boot-nodtb.bin bl31.bin $(dtb) $(supp_dtbs)
++print_fit_hab_flexspi: u-boot-nodtb.bin bl31.bin $(dtb) $(supp_dtbs) uefi.fit
+ 	./$(PAD_IMAGE) $(TEE)
+ 	./$(PAD_IMAGE) bl31.bin
+ 	./$(PAD_IMAGE) u-boot-nodtb.bin $(dtb) $(supp_dtbs)
+-	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) VERSION=$(VERSION) BOOT_DEV="flexspi" ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb) $(supp_dtbs)
++	FIT_DATA_POS=$(FIT_EXTERNAL_POSITION) TEE_LOAD_ADDR=$(TEE_LOAD_ADDR) ATF_LOAD_ADDR=$(ATF_LOAD_ADDR) UEFI_FIT_LOAD_ADDR=$(UEFI_FIT_LOAD_ADDR) VERSION=$(VERSION) BOOT_DEV="flexspi" ../$(SOC_DIR)/print_fit_hab.sh $(PRINT_FIT_HAB_OFFSET) $(dtb) $(supp_dtbs)
+ 	@rm -f $(dtb)
+ 
+ nightly :
+diff --git a/iMX8QX/gen_qxp_csf.sh b/iMX8QX/gen_qxp_csf.sh
+new file mode 100755
+index 0000000..3e35494
+--- /dev/null
++++ b/iMX8QX/gen_qxp_csf.sh
+@@ -0,0 +1,70 @@
++#!/bin/bash
++#
++# Container #3 composition:
++# ~~~~~~~~~~~~~~~~~~~~~~~~~
++#   + bl31.bin        load addr 0x80000000
++#   + u-boot-hash.bin load addr 0x80020000
++#   + tee.bin         load addr 0xFE000000
++#   + uefi.fit        load addr 0x80B83F5C (payload load addr 0x80B84000)
++#
++# Example mkimage outputs:
++# ~~~~~~~~~~~~~~~~~~~~~~~~
++#            Offset of entry
++#            within container  Size of entry
++#                    |             |
++#                    V             V
++# AP file_offset = 0x2000 size = 0x9400
++#
++# CST: CONTAINER 0 offset: 0x400                         <--- Offset of the image header within file
++# CST: CONTAINER 0: Signature Block: offset is at 0x510  <--- Offset of the signature header
++
++if [ -z $CONTAINER_PATH ] || [ -z $SRK_TABLE_PATH ] || [ -z $CERT_PEM_PATH ] || [ -z $LOGFILE_PATH ]; then
++	echo "This script parses output of imx mkimage utility" >&2
++	echo "in order to find signature header within imx container" >&2
++	echo "and appends its addresses to csf template. The template is then" >&2
++	echo "used to sign the container." >&2
++	echo "" >&2
++	echo "Required env variables:" >&2
++	echo "  CONTAINER_PATH - Binary to be signed generated by mkimage" >&2
++	echo "  SRK_TABLE_PATH - SRK table generated by srktool" >&2
++	echo "  CERT_PEM_PATH  - Public key certificate in PEM format" >&2
++	echo "  LOGFILE_PATH   - Public key certificate in PEM format" >&2
++	echo "" >&2
++	echo "Some env variable is not set!" >&2
++	exit 1;
++fi
++
++# Index of the public key certificate within the SRK table (0 .. 3)
++KEY_INDEX=0
++# Type of SRK set (NXP or OEM)
++SRK_SET="OEM"
++# bitmask of the revoked SRKs
++REVOCATIONS="0x0"
++
++# Extract image header offset and signature block offset from mkimage logs
++filter1=$(cat "$LOGFILE_PATH" | grep "CONTAINER 0" | tr '\n' ' ')
++[[ $filter1 =~ ^CST:\ CONTAINER\ 0\ offset:\ (.*)\ CST:\ CONTAINER\ 0:\ Signature\ Block:\ offset\ is\ at\ (.*)$ ]]
++if [ ${#BASH_REMATCH[@]} -ne 3 ]; then
++	echo "Error parsing mkimage logs!"
++	# exit 1
++fi
++
++echo "Container offset: ${BASH_REMATCH[1]}" >&2
++echo "Signature block offset: ${BASH_REMATCH[2]}" >&2
++
++# Fill CSF template and print to stdout
++cat <<EOL
++[Header]
++Target = AHAB
++Version = 1.0
++[Install SRK]
++File = "$SRK_TABLE_PATH"
++Source = "$CERT_PEM_PATH"
++Source index = $KEY_INDEX
++Source set = $SRK_SET
++Revocations = $REVOCATIONS
++[Authenticate Data]
++File = "$CONTAINER_PATH"
++# Offsets = Container header  Signature block (printed out by mkimage)
++Offsets   = ${BASH_REMATCH[1]}             ${BASH_REMATCH[2]}
++EOL
+diff --git a/iMX8QX/soc.mak b/iMX8QX/soc.mak
+index 4817f32..c6ce7c8 100755
+--- a/iMX8QX/soc.mak
++++ b/iMX8QX/soc.mak
+@@ -63,6 +63,9 @@ u-boot-atf-container.img: bl31.bin u-boot-hash.bin
+ 	./$(MKIMG) -soc QX -rev B0 -c -ap bl31.bin a35 0x80000000 -ap u-boot-hash.bin a35 0x80020000 -out u-boot-atf-container.img; \
+ 	fi
+ 
++u-boot-atf-optee-uefi-container.img: bl31.bin u-boot-hash.bin uefi.fit tee.bin
++	./$(MKIMG) -soc QX -rev B0 -c -ap bl31.bin a35 0x80000000 -ap u-boot-hash.bin a35 0x80020000 -ap tee.bin a35 $(TEE_LOAD_ADDR) -ap uefi.fit a35 0x80B83F5C -out u-boot-atf-optee-uefi-container.img
++
+ Image0: Image
+ 	@dd if=Image of=Image0 bs=10M count=1
+ Image1: Image
+@@ -70,7 +73,7 @@ Image1: Image
+ 
+ .PHONY: clean nightly
+ clean:
+-	@rm -f $(MKIMG) $(DCD_CFG) .imx8qx_dcd.cfg.cfgtmp.d u-boot-atf-container.img Image0 Image1
++	@rm -f $(MKIMG) $(DCD_CFG) .imx8qx_dcd.cfg.cfgtmp.d u-boot-atf-container.img u-boot-atf-optee-uefi-container.img Image0 Image1
+ 	@rm -rf extracted_imgs
+ 	@echo "imx8qx clean done"
+ 
+@@ -92,6 +95,13 @@ flash_spl: $(MKIMG) $(AHAB_IMG) scfw_tcm.bin u-boot-spl.bin u-boot-atf-container
+                    echo "append u-boot-atf-container.img at $$pad_cnt KB"; \
+                    dd if=u-boot-atf-container.img of=flash.bin bs=1K seek=$$pad_cnt;
+ 
++flash_spl_uefi: $(MKIMG) $(AHAB_IMG) scfw_tcm.bin u-boot-spl.bin u-boot-atf-optee-uefi-container.img
++	./$(MKIMG) -soc QX -rev B0 -dcd skip -append $(AHAB_IMG) -c -scfw scfw_tcm.bin -ap u-boot-spl.bin a35 0x00100000 -out flash.bin
++	@flashbin_size=`wc -c flash.bin | awk '{print $$1}'`; \
++                   pad_cnt=$$(((flashbin_size + 0x400 - 1) / 0x400)); \
++                   echo "append u-boot-atf-optee-uefi-container.img at $$pad_cnt KB"; \
++                   dd if=u-boot-atf-optee-uefi-container.img of=flash.bin bs=1K seek=$$pad_cnt;
++
+ flash_spl_flexspi: $(MKIMG) $(AHAB_IMG) scfw_tcm.bin u-boot-spl.bin u-boot-atf-container.img
+ 	./$(MKIMG) -soc QX -rev B0 -dcd skip -dev flexspi -append $(AHAB_IMG) -c -scfw scfw_tcm.bin -ap u-boot-spl.bin a35 0x00100000 -out flash.bin
+ 	@flashbin_size=`wc -c flash.bin | awk '{print $$1}'`; \
+diff --git a/iMX9/gen_csf.sh b/iMX9/gen_csf.sh
+new file mode 100755
+index 0000000..e9ab062
+--- /dev/null
++++ b/iMX9/gen_csf.sh
+@@ -0,0 +1,71 @@
++#!/bin/bash
++# i.MX93
++#
++# Container #3 composition:
++# ~~~~~~~~~~~~~~~~~~~~~~~~~
++#   + bl31.bin        load addr 0x80000000
++#   + u-boot-hash.bin load addr 0x82200000
++#   + tee.bin         load addr 0x80200000
++#   + uefi.fit        load addr 0x82303F5C (payload load addr 0x82304000)
++#
++# Example mkimage outputs:
++# ~~~~~~~~~~~~~~~~~~~~~~~~
++#            Offset of entry
++#            within container  Size of entry
++#                    |             |
++#                    V             V
++# AP file_offset = 0x2000 size = 0x9400
++#
++# CST: CONTAINER 0 offset: 0x400                         <--- Offset of the image header within file
++# CST: CONTAINER 0: Signature Block: offset is at 0x510  <--- Offset of the signature header
++
++if [ -z $CONTAINER_PATH ] || [ -z $SRK_TABLE_PATH ] || [ -z $CERT_PEM_PATH ] || [ -z $LOGFILE_PATH ]; then
++	echo "This script parses output of imx mkimage utility" >&2
++	echo "in order to find signature header within imx container" >&2
++	echo "and appends its addresses to csf template. The template is then" >&2
++	echo "used to sign the container." >&2
++	echo "" >&2
++	echo "Required env variables:" >&2
++	echo "  CONTAINER_PATH - Binary to be signed generated by mkimage" >&2
++	echo "  SRK_TABLE_PATH - SRK table generated by srktool" >&2
++	echo "  CERT_PEM_PATH  - Public key certificate in PEM format" >&2
++	echo "  LOGFILE_PATH   - Public key certificate in PEM format" >&2
++	echo "" >&2
++	echo "Some env variable is not set!" >&2
++	exit 1;
++fi
++
++# Index of the public key certificate within the SRK table (0 .. 3)
++KEY_INDEX=0
++# Type of SRK set (NXP or OEM)
++SRK_SET="OEM"
++# bitmask of the revoked SRKs
++REVOCATIONS="0x0"
++
++# Extract image header offset and signature block offset from mkimage logs
++filter1=$(cat "$LOGFILE_PATH" | grep "CONTAINER 0" | tr '\n' ' ')
++[[ $filter1 =~ ^CST:\ CONTAINER\ 0\ offset:\ (.*)\ CST:\ CONTAINER\ 0:\ Signature\ Block:\ offset\ is\ at\ (.*)$ ]]
++if [ ${#BASH_REMATCH[@]} -ne 3 ]; then
++	echo "Error parsing mkimage logs!"
++	# exit 1
++fi
++
++echo "Container offset: ${BASH_REMATCH[1]}" >&2
++echo "Signature block offset: ${BASH_REMATCH[2]}" >&2
++
++# Fill CSF template and print to stdout
++cat <<EOL
++[Header]
++Target = AHAB
++Version = 1.0
++[Install SRK]
++File = "$SRK_TABLE_PATH"
++Source = "$CERT_PEM_PATH"
++Source index = $KEY_INDEX
++Source set = $SRK_SET
++Revocations = $REVOCATIONS
++[Authenticate Data]
++File = "$CONTAINER_PATH"
++# Offsets = Container header  Signature block (printed out by mkimage)
++Offsets   = ${BASH_REMATCH[1]}             ${BASH_REMATCH[2]}
++EOL
+diff --git a/iMX9/soc.mak b/iMX9/soc.mak
+index b17db6b..202f806 100644
+--- a/iMX9/soc.mak
++++ b/iMX9/soc.mak
+@@ -2,15 +2,12 @@ MKIMG = ../mkimage_imx8
+ 
+ CC ?= gcc
+ REV ?= A0
+-OEI ?= NO
+-MSEL ?= 0
+ CFLAGS ?= -O2 -Wall -std=c99 -static
+ INCLUDE = ./lib
+ 
+ #define the F(Q)SPI header file
+ QSPI_HEADER = ../scripts/fspi_header
+ QSPI_PACKER = ../scripts/fspi_packer.sh
+-QSPI_FCB_GEN = ../scripts/fspi_fcb_gen.sh
+ PAD_IMAGE = ../scripts/pad_image.sh
+ 
+ ifneq ($(wildcard /usr/bin/rename.ul),)
+@@ -54,7 +51,9 @@ AHAB_IMG = mx93$(LC_REVISION)-ahab-container.img
+ SPL_LOAD_ADDR ?= 0x2049A000
+ SPL_LOAD_ADDR_M33_VIEW ?= 0x3049A000
+ ATF_LOAD_ADDR ?= 0x204E0000
+-UBOOT_LOAD_ADDR ?= 0x80200000
++TEE_LOAD_ADDR ?= 0x80200000
++UBOOT_LOAD_ADDR ?= 0x82200000
++UEFI_LOAD_ADDR ?= 0x82303F5C
+ MCU_TCM_ADDR ?= 0x1FFE0000		# 128KB TCM
+ MCU_TCM_ADDR_ACORE_VIEW ?= 0x201E0000
+ LPDDR_FW_VERSION ?= _v202201
+@@ -128,33 +127,6 @@ lpddr4_imem_1d = lpddr4_imem_1d$(LPDDR_FW_VERSION).bin
+ lpddr4_dmem_1d = lpddr4_dmem_1d$(LPDDR_FW_VERSION).bin
+ lpddr4_imem_2d = lpddr4_imem_2d$(LPDDR_FW_VERSION).bin
+ lpddr4_dmem_2d = lpddr4_dmem_2d$(LPDDR_FW_VERSION).bin
+-lpddr4_imem_qb = lpddr4_imem_qb$(LPDDR_FW_VERSION).bin
+-lpddr4_dmem_qb = lpddr4_dmem_qb$(LPDDR_FW_VERSION).bin
+-lpddr4_qb_data = lpddr4_qb_data.bin
+-
+-lpddr_imem = $(LPDDR_TYPE)_imem$(LPDDR_FW_VERSION).bin
+-lpddr_dmem = $(LPDDR_TYPE)_dmem$(LPDDR_FW_VERSION).bin
+-
+-fw-header.bin: $(lpddr_imem) $(lpddr_dmem)
+-	@imem_size=`wc -c $(lpddr_imem) | awk '{printf "%.8x", $$1}' | sed -e 's/\(..\)\(..\)\(..\)\(..\)/\4\3\2\1/'`; \
+-		echo $$imem_size | xxd -r -p >  fw-header.bin
+-	@dmem_size=`wc -c $(lpddr_dmem) | awk '{printf "%.8x", $$1}' | sed -e 's/\(..\)\(..\)\(..\)\(..\)/\4\3\2\1/'`; \
+-		echo $$dmem_size | xxd -r -p >> fw-header.bin
+-
+-define append_ddrfw_v2
+-	@dd if=$(1) of=$(1)-pad bs=4 conv=sync
+-	@cat $(1)-pad fw-header.bin $(lpddr_imem) $(lpddr_dmem) > $(2)
+-	@rm -f $(1)-pad fw-header.bin
+-endef
+-
+-oei-a55-ddr.bin: $(OEI_A55_IMG) $(lpddr_imem) $(lpddr_dmem) fw-header.bin
+-	$(call append_ddrfw_v2,$(OEI_A55_IMG),oei-a55-ddr.bin)
+-
+-oei-m33-ddr.bin: $(OEI_M33_IMG) $(lpddr_imem) $(lpddr_dmem) fw-header.bin
+-	$(call append_ddrfw_v2,$(OEI_M33_IMG),oei-m33-ddr.bin)
+-
+-u-boot-spl-ddr-v2.bin: u-boot-spl.bin $(lpddr_imem) $(lpddr_dmem) fw-header.bin
+-	$(call append_ddrfw_v2,u-boot-spl.bin,u-boot-spl-ddr-v2.bin)
+ 
+ u-boot-spl-ddr.bin: u-boot-spl.bin $(lpddr4_imem_1d) $(lpddr4_dmem_1d) $(lpddr4_imem_2d) $(lpddr4_dmem_2d)
+ 	@objcopy -I binary -O binary --pad-to 0x8000 --gap-fill=0x0 $(lpddr4_imem_1d) lpddr4_pmu_train_1d_imem_pad.bin
+@@ -211,6 +183,13 @@ u-boot-atf-container.img: bl31.bin u-boot-hash.bin
+ 			   -out u-boot-atf-container.img; \
+ 	fi
+ 
++u-boot-atf-optee-uefi-container.img: bl31.bin u-boot-hash.bin uefi.fit tee.bin
++	./$(MKIMG) -soc IMX9 -c \
++		-ap bl31.bin a55 $(ATF_LOAD_ADDR) \
++		-ap u-boot-hash.bin a55 $(UBOOT_LOAD_ADDR) \
++		-ap $(TEE) a55 $(TEE_LOAD_ADDR) \
++		-ap uefi.fit a55 $(UEFI_LOAD_ADDR) -out u-boot-atf-optee-uefi-container.img
++
+ u-boot-atf-container-spinand.img: bl31.bin u-boot-hash.bin
+ 	if [ -f $(TEE) ]; then \
+ 		if [ $(shell echo $(ROLLBACK_INDEX_IN_CONTAINER)) ]; then \
+@@ -289,6 +268,11 @@ flash_singleboot: $(MKIMG) $(AHAB_IMG) $(SPL_A55_IMG) u-boot-atf-container.img $
+ 		   -ap $(SPL_A55_IMG) a55 $(SPL_LOAD_ADDR) -out flash.bin
+ 	$(call append_container,u-boot-atf-container.img,1)
+ 
++flash_singleboot_uefi: $(MKIMG) $(AHAB_IMG) $(SPL_A55_IMG)  $(OEI_A55_DDR)
++	./$(MKIMG) -soc IMX9 -append $(AHAB_IMG) -c $(OEI_OPT_A55) \
++		   -ap $(SPL_A55_IMG) a55 $(SPL_LOAD_ADDR) -out flash.bin
++	$(call append_container,u-boot-atf-optee-uefi-container.img,1)
++
+ flash_singleboot_no_ahabfw: $(MKIMG) $(SPL_A55_IMG) u-boot-atf-container.img $(OEI_A55_DDR)
+ 	./$(MKIMG) -soc IMX9 -c $(OEI_OPT_A55) \
+ 		   -ap $(SPL_A55_IMG) a55 $(SPL_LOAD_ADDR) -out flash.bin

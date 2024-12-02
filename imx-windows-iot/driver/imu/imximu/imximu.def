@@ -1,0 +1,5 @@
+; imximu.def : Declares the module parameters.
+
+LIBRARY imximu
+
+EXPORTS

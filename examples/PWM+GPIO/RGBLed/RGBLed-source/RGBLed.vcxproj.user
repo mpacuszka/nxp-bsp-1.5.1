@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <RemoteDebuggerCommand>C:\Users\a\Desktop\RGBled\Debug</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>C:\Users\a\Desktop\RGBled</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.171.65.70</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
+    <DeploymentDirectory>C:\Users\a\Desktop\RGBled</DeploymentDirectory>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='test|ARM'">
+    <RemoteDebuggerCommand>C:\Users\a\Desktop\RGBled\Debug</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>C:\Users\a\Desktop\RGBled</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.171.65.70</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
+    <DeploymentDirectory>C:\Users\a\Desktop\RGBled</DeploymentDirectory>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='test|ARM64'">
+    <RemoteDebuggerCommand>C:\Users\a\Desktop\RGBled\Debug</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>C:\Users\a\Desktop\RGBled</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.171.65.70</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
+    <DeploymentDirectory>C:\Users\a\Desktop\RGBled</DeploymentDirectory>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <RemoteDebuggerCommand>C:\Users\a\Desktop\RGBled\ARM64\Debug\rgb_led.exe</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>C:\Users\a\Desktop\RGBled\ARM64\Debug</RemoteDebuggerWorkingDirectory>
+    <RemoteDebuggerServerName>10.171.65.70</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>NativeOnly</RemoteDebuggerDebuggerType>
+    <DeploymentDirectory>C:\Users\a\Desktop\RGBled\ARM64\Debug</DeploymentDirectory>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,91 @@
+/*++
+;
+;Copyright (c) Microsoft Corporation.  All rights reserved.
+;Copyright 2022 NXP
+;
+;Module Name:
+;    imxgyro_fxas21002.INF
+;
+;Abstract:
+;    INF file for installing driver for FXAS210002 gyroscope
+;
+;--*/
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = Sensor
+ClassGuid   = {5175D334-C371-4806-B3BA-71FD53C9258D}
+Provider    = NXP
+PnpLockdown = 1
+CatalogFile = imxgyro_fxas21002.cat
+DriverVer   = ; stampinf will fill in driver version
+
+[DestinationDirs]
+;12 == Windows\System32\Drivers\UMDF
+DefaultDestDir = 12,UMDF
+
+[SourceDisksNames]
+1 = %MediaDescription%,,,""
+
+[SourceDisksFiles]
+imxgyro_fxas21002.dll   = 1,,
+
+[Manufacturer]
+%ManufacturerName% = imxgyro_fxas21002_Device, NT$ARCH$.10.0...19041
+
+
+;*******************************
+; imxgyro_fxas21002 Install Section
+;*******************************
+
+[imxgyro_fxas21002_Device.NT$ARCH$.10.0...19041]
+; DisplayName       Section          DeviceId
+; -----------       -------          --------
+%imxgyro_fxas21002_DevDesc% = imxgyro_fxas21002_Inst, ACPI\NXP0210
+
+[imxgyro_fxas21002_Inst.NT]
+CopyFiles = imxgyro_fxas21002DriverCopy
+
+[imxgyro_fxas21002_Inst.NT.hw]
+
+[imxgyro_fxas21002DriverCopy]
+imxgyro_fxas21002.dll
+
+;-------------- Service installation
+
+[imxgyro_fxas21002_Inst.NT.Services]
+AddService = WUDFRd,0x000001fa,WUDFRD_ServiceInstall
+
+[WUDFRD_ServiceInstall]
+DisplayName   = %WudfRdDisplayName%
+ServiceType   = %SERVICE_KERNEL_DRIVER%
+StartType     = %SERVICE_DEMAND_START%
+ErrorControl  = %SERVICE_ERROR_NORMAL%
+ServiceBinary = %12%\WUDFRd.sys
+
+;-------------- WDF specific section
+
+[imxgyro_fxas21002_Inst.NT.Wdf]
+UmdfService					= imxgyro_fxas21002, imxgyro_fxas21002_Install
+UmdfServiceOrder			= imxgyro_fxas21002
+UmdfDirectHardwareAccess	= AllowDirectHardwareAccess
+UmdfFileObjectPolicy		= AllowNullAndUnknownFileObjects
+UmdfFsContextUsePolicy		= CannotUseFsContexts
+
+[imxgyro_fxas21002_Install]
+UmdfLibraryVersion			= $UMDFVERSION$
+ServiceBinary				= %12%\UMDF\imxgyro_fxas21002.dll
+UmdfExtensions				= SensorsCx0102
+
+[Strings]
+;Localizable Strings
+MediaDescription			= "FXAS21002 Gyroscope Driver"
+ProviderName				= "NXP"
+ManufacturerName			= "NXP"
+imxgyro_fxas21002_DevDesc	= "FXAS21002 Gyroscope"
+WudfRdDisplayName			= "Windows Driver Foundation - User-mode Driver Framework Reflector"
+
+;Non-Localizable Strings
+SERVICE_KERNEL_DRIVER		= 1
+SERVICE_DEMAND_START		= 3
+SERVICE_ERROR_NORMAL		= 1

@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\MQ">
+      <UniqueIdentifier>{9667d194-ce88-4035-8a04-474cdf812592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MP">
+      <UniqueIdentifier>{ddcc683a-bddf-4bac-9964-0ca286316ba3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GcKmd7LAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LMmu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\GcKmdEmuAdapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LMmuCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\GcKmd7LEmuMmu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\GcKmdEmuEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\GcKmdEmuNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="precomp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LPower.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GcKmd7LGlobal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\gccommon\GcHw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LMmu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7L.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\Gc7LMmu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\GcCommandBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LMmuCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\GcKmd7LEmuMmu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\GcKmdEmuAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\GcKmdEmuEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\GcKmdEmuNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="precomp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GcKmd7LDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdAdapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdDdi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdGlobal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdLogging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdProcess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdSwQueueNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcKmdUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\GcLogging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\AllocationExchangeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\gcdispif.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\gcdispif\GcKmdAllocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\AdapterExchangeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\ContextExchangeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\wddmfw\include\SubmissionExchangeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\Gc7LCmdBufPatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gc7LCmdGdiOp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Gc7LCmdGdiOpData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\Gc7LGdiOpParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\Gc7LTexDesc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompAB.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompBB.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompCF.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompCTB.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompSB.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCompTB.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCopyBuf.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdCopyImg.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdFillBuf.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MQ\Gc7LCmdFillImg.h">
+      <Filter>Header Files\MQ</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompAB.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompBB.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompTB.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompCF.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompCTB.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gccommon\MP\Gc7LCmdCompSB.h">
+      <Filter>Header Files\MP</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

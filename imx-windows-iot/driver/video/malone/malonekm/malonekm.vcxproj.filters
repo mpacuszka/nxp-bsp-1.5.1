@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Driver Files">
+      <UniqueIdentifier>{8E41214B-6785-4CFE-B992-037D68949A14}</UniqueIdentifier>
+      <Extensions>inf;inv;inx;mof;mc;</Extensions>
+    </Filter>
+    <Filter Include="Source Files\vpu_hw">
+      <UniqueIdentifier>{f4ecdf9e-4796-4f19-bdd4-82ef61f3c1c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vpu_rpc">
+      <UniqueIdentifier>{164fd4f0-31cc-4d8c-b025-4da458359d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vpu_hw">
+      <UniqueIdentifier>{396b12b6-f098-43c2-9ce0-22c57ce00707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vpu_rpc">
+      <UniqueIdentifier>{8d41e65d-801f-44c9-82cf-8ed1fecaa10e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\vpu_dec">
+      <UniqueIdentifier>{7fda5334-d46f-483d-a942-7dcab43f112c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vpu_dec">
+      <UniqueIdentifier>{83942a5c-51db-4cef-a45d-8c57b7c6cbe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\vpu_hw\scfw">
+      <UniqueIdentifier>{0ee3bd42-2067-40a2-b19f-7b06083b30b8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="malonekm.inf">
+      <Filter>Driver Files</Filter>
+    </Inf>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Public.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imx8q_driver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_hw\vpu_mu.h">
+      <Filter>Header Files\vpu_hw</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_hw\parent_device.h">
+      <Filter>Header Files\vpu_hw</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_rpc\mediasys_types.h">
+      <Filter>Header Files\vpu_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_rpc\vpu_rpc.h">
+      <Filter>Header Files\vpu_rpc</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_dec\vdec.h">
+      <Filter>Header Files\vpu_dec</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_hw\vpu_hw_defs.h">
+      <Filter>Header Files\vpu_hw</Filter>
+    </ClInclude>
+    <ClInclude Include="circ_queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_dec\vdec_cmn.h">
+      <Filter>Header Files\vpu_dec</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_dec\vdec_io.h">
+      <Filter>Header Files\vpu_dec</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_dec\fbl.h">
+      <Filter>Header Files\vpu_dec</Filter>
+    </ClInclude>
+    <ClInclude Include="vpu_hw\vpu_memory.h">
+      <Filter>Header Files\vpu_hw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\shared\mu\fsl_mu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="imxblit_public.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Device.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="driver.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_hw\vpu_core.c">
+      <Filter>Source Files\vpu_hw</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_hw\vpu_memory.c">
+      <Filter>Source Files\vpu_hw</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_hw\vpu_mu.c">
+      <Filter>Source Files\vpu_hw</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_rpc\vpu_rpc.c">
+      <Filter>Source Files\vpu_rpc</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_dec\vdec.c">
+      <Filter>Source Files\vpu_dec</Filter>
+    </ClCompile>
+    <ClCompile Include="circ_queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Trace.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ioctl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_hw\vpu_pwrclk.c">
+      <Filter>Source Files\vpu_hw</Filter>
+    </ClCompile>
+    <ClCompile Include="vpu_dec\fbl.c">
+      <Filter>Source Files\vpu_dec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\mu\fsl_mu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\main\ipc.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\irq\irq_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\misc\misc_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\pad\pad_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\pm\pm_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\rm\rm_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\seco\seco_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\shared\scfw\svc\timer\timer_rpc_clnt.c">
+      <Filter>Source Files\vpu_hw\scfw</Filter>
+    </ClCompile>
+    <ClCompile Include="imxblit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,61 @@
+diff --git a/core/arch/arm/plat-imx/conf.mk b/core/arch/arm/plat-imx/conf.mk
+index 0bd9ccd6b..e86851bd8 100644
+--- a/core/arch/arm/plat-imx/conf.mk
++++ b/core/arch/arm/plat-imx/conf.mk
+@@ -1,4 +1,9 @@
+ PLATFORM_FLAVOR ?= mx6ulevk
++WINDOWS_BSP ?= n
++
++ifneq (,$(filter $(WINDOWS_BSP),y))
++CFLAGS+=-DWINDOWS_BSP
++endif
+ 
+ # Get SoC associated with the PLATFORM_FLAVOR
+ mx6ul-flavorlist = \
+diff --git a/core/drivers/imx_snvs.c b/core/drivers/imx_snvs.c
+index eaa8fb25b..2b99d9fce 100644
+--- a/core/drivers/imx_snvs.c
++++ b/core/drivers/imx_snvs.c
+@@ -163,6 +163,9 @@ bool plat_rpmb_key_is_ready(void)
+ {
+ 	enum snvs_ssm_mode mode = SNVS_SSM_MODE_INIT;
+ 	bool ssm_secure = false;
++#if defined(WINDOWS_BSP) && defined(CFG_RPMB_TESTKEY)
++	enum snvs_security_cfg security = SNVS_SECURITY_CFG_OPEN;
++#endif
+ 
+ 	mode = snvs_get_ssm_mode();
+ 	ssm_secure = (mode == SNVS_SSM_MODE_TRUSTED ||
+@@ -176,7 +179,17 @@ bool plat_rpmb_key_is_ready(void)
+ 	if (soc_is_imx6sdl() || soc_is_imx6dq())
+ 		return ssm_secure;
+ 
++#if defined(WINDOWS_BSP) && defined(CFG_RPMB_TESTKEY)
++        security = snvs_get_security_cfg();
++	return ((security == SNVS_SECURITY_CFG_CLOSED) && ssm_secure) ||
++	       ((security == SNVS_SECURITY_CFG_OPEN) &&
++		        (mode == SNVS_SSM_MODE_TRUSTED ||
++		         mode == SNVS_SSM_MODE_SECURE ||
++				 mode == SNVS_SSM_MODE_NON_SECURE ||
++				 mode == SNVS_SSM_MODE_CHECK));
++#else
+ 	return ssm_secure && snvs_is_device_closed();
++#endif
+ }
+ #endif /* CFG_RPMB_FS */
+ 
+diff --git a/core/drivers/imx_uart.c b/core/drivers/imx_uart.c
+index 6d7bd2963..610eed09b 100644
+--- a/core/drivers/imx_uart.c
++++ b/core/drivers/imx_uart.c
+@@ -122,6 +122,10 @@ static void imx_uart_putc(struct serial_chip *chip, int ch)
+ 			return;
+ 
+ 	io_write32(base + UTXD, ch);
++#if defined(WINDOWS_BSP)
++	/* Wait until sent */
++	while (!(io_read32(base + UTS) & UTS_TXEMPTY));
++#endif
+ }
+ 
+ static const struct serial_ops imx_uart_ops = {

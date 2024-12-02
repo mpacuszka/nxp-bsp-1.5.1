@@ -1,0 +1,6 @@
+; imxals.def : Declares the module parameters.
+
+LIBRARY imxals
+
+EXPORTS
+

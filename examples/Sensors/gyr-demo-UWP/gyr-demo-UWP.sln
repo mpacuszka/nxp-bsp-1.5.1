@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33920.266
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gyr-demo-UWP", "gyr-demo-UWP.vcxproj", "{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Release|ARM64 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Debug|ARM64.Build.0 = Debug|ARM64
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Release|ARM64.ActiveCfg = Release|ARM64
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Release|ARM64.Build.0 = Release|ARM64
+		{4534DD1B-B0B3-40A2-A526-8B16DCEA066E}.Release|ARM64.Deploy.0 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C742345-ECC8-441A-8C25-2A43F26CDE39}
+	EndGlobalSection
+EndGlobal

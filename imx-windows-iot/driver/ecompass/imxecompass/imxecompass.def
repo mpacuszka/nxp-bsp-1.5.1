@@ -1,0 +1,5 @@
+; imxecompass.def : Declares the module parameters.
+
+LIBRARY imxecompass
+
+EXPORTS

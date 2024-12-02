@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33920.266
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mag-demo-UWP", "mag-demo-UWP.vcxproj", "{B958D533-7271-438D-B8A4-3E3C5FD0B265}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Release|ARM64 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Debug|ARM64.ActiveCfg = Release|ARM64
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Debug|ARM64.Build.0 = Release|ARM64
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Debug|ARM64.Deploy.0 = Release|ARM64
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Release|ARM64.ActiveCfg = Release|ARM64
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Release|ARM64.Build.0 = Release|ARM64
+		{B958D533-7271-438D-B8A4-3E3C5FD0B265}.Release|ARM64.Deploy.0 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9AF8A5EC-5691-4B67-A844-29ED7BBEEAE1}
+	EndGlobalSection
+EndGlobal

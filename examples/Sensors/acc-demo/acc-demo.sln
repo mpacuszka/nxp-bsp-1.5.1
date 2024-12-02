@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33920.266
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "acc-demo", "acc-demo.vcxproj", "{53CAC831-8B4E-457A-B69D-3A9E3A09A003}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Release|ARM64 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53CAC831-8B4E-457A-B69D-3A9E3A09A003}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{53CAC831-8B4E-457A-B69D-3A9E3A09A003}.Debug|ARM64.Build.0 = Debug|ARM64
+		{53CAC831-8B4E-457A-B69D-3A9E3A09A003}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{53CAC831-8B4E-457A-B69D-3A9E3A09A003}.Release|ARM64.ActiveCfg = Release|ARM64
+		{53CAC831-8B4E-457A-B69D-3A9E3A09A003}.Release|ARM64.Build.0 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {25C01BBE-A92C-4F0A-8E5D-644B075B9207}
+	EndGlobalSection
+EndGlobal

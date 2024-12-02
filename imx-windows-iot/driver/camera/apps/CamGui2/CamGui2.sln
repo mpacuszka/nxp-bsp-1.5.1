@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1684
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CamGui2", "CamGui2\CamGui2.vcxproj", "{5882A114-36E3-45C2-A818-EF7BC7F2341F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM64 = Debug|ARM64
+		Release|ARM64 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5882A114-36E3-45C2-A818-EF7BC7F2341F}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{5882A114-36E3-45C2-A818-EF7BC7F2341F}.Debug|ARM64.Build.0 = Debug|ARM64
+		{5882A114-36E3-45C2-A818-EF7BC7F2341F}.Release|ARM64.ActiveCfg = Release|ARM64
+		{5882A114-36E3-45C2-A818-EF7BC7F2341F}.Release|ARM64.Build.0 = Release|ARM64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {934B653A-C9DF-450F-94C1-7C5B775DDF2C}
+	EndGlobalSection
+EndGlobal

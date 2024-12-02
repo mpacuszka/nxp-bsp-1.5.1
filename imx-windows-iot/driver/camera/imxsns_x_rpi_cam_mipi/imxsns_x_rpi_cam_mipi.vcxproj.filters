@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="Queue.cpp" />
+    <ClCompile Include="..\..\shared\acpi\acpiutil.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\OperatorNew.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\WdfIoTargets.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\shared\acpi\dsdtutil.cpp" />
+    <ClCompile Include="x_rpi_cam_mipi\imx_x_rpi_cam_mipi.cpp">
+      <Filter>X-RPI-CAM-MIPI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Driver.h" />
+    <ClInclude Include="Public.h" />
+    <ClInclude Include="Trace.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="x_rpi_cam_mipi\adp5585.h">
+      <Filter>X-RPI-CAM-MIPI</Filter>
+    </ClInclude>
+    <ClInclude Include="x_rpi_cam_mipi\imx_x_rpi_cam_mipi.h">
+      <Filter>X-RPI-CAM-MIPI</Filter>
+    </ClInclude>
+    <ClInclude Include="x_rpi_cam_mipi\ImxCameraInterface.h">
+      <Filter>X-RPI-CAM-MIPI</Filter>
+    </ClInclude>
+    <ClInclude Include="ap1302.h">
+      <Filter>X-RPI-CAM-MIPI</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="imxsns_x_rpi_cam_mipi.inf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="utils">
+      <UniqueIdentifier>{cbb39125-b841-4367-9a0b-0efdc820d23b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hardware">
+      <UniqueIdentifier>{c74d2d25-8ca0-4132-ae85-910fbf55e99a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="X-RPI-CAM-MIPI">
+      <UniqueIdentifier>{6f912996-d220-4b3c-ac80-986086334b3b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+</Project>

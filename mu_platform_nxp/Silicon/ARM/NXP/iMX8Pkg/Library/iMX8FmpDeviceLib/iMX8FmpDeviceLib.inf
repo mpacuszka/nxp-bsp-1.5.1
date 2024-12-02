@@ -1,0 +1,43 @@
+## @file
+#  Provides firmware device specific services to support updates of a firmware
+#  image stored in a firmware device.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright 2022 NXP.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = iMX8FmpDeviceLib
+  MODULE_UNI_FILE = iMX8FmpDeviceLib.uni
+  FILE_GUID       = 4A4D0625-BB5E-4A42-BEDD-E44295977425
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = iMX8FmpDeviceLib|DXE_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  iMX8FmpDeviceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  iMX8Pkg/iMX8Pkg.dec
+  Microsoft/MsPkg.dec
+
+[Protocols]
+  gEfiBlockIoProtocolGuid                        ## TO START
+  gEfiShellProtocolGuid
+  gEfiSdMmcPartProtocolGuid
+  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionLowestSupportedString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareImageOffset

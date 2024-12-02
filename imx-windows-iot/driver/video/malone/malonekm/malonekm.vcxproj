@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{79FA9FF3-3113-44AF-BB5D-D2C48EA9648D}</ProjectGuid>
+    <TemplateGuid>{497e31cb-056b-4f31-abb8-447fd55ee5a5}</TemplateGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration>Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">ARM64</Platform>
+    <RootNamespace>imx8q-vpu-km</RootNamespace>
+    <ProjectName>malonekm</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <TargetVersion>Windows10</TargetVersion>
+    <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
+    <ConfigurationType>Driver</ConfigurationType>
+    <DriverType>KMDF</DriverType>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
+    <OutDir>$(MainOutput)$(ProjectName)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\..\..\..\build\common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup>
+    <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ApiValidator_Enable>false</ApiValidator_Enable>
+    <IncludePath>$(IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(ProjectDir)\vpu_rpc\;$(ProjectDir)\vpu_hw\;$(ProjectDir)\..\..\..\shared\mu\;$(ProjectDir)\..\..\..\include\;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ApiValidator_Enable>false</ApiValidator_Enable>
+    <IncludePath>$(IncludePath);$(KMDF_INC_PATH)$(KMDF_VER_PATH);$(ProjectDir)\vpu_rpc\;$(ProjectDir)\vpu_hw\;$(ProjectDir)\..\..\..\shared\mu\;$(ProjectDir)\..\..\..\include\;</IncludePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\shared\mu\fsl_mu.c" />
+    <ClCompile Include="..\..\..\shared\scfw\main\ipc.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\irq\irq_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\misc\misc_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\pad\pad_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\pm\pm_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\rm\rm_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\seco\seco_rpc_clnt.c" />
+    <ClCompile Include="..\..\..\shared\scfw\svc\timer\timer_rpc_clnt.c" />
+    <ClCompile Include="Device.c" />
+    <ClCompile Include="driver.c" />
+    <ClCompile Include="circ_queue.c" />
+    <ClCompile Include="imxblit.cpp" />
+    <ClCompile Include="ioctl.c" />
+    <ClCompile Include="Trace.c" />
+    <ClCompile Include="vpu_dec\fbl.c" />
+    <ClCompile Include="vpu_dec\vdec.c" />
+    <ClCompile Include="vpu_hw\vpu_mu.c" />
+    <ClCompile Include="vpu_hw\vpu_core.c" />
+    <ClCompile Include="vpu_hw\vpu_memory.c" />
+    <ClCompile Include="vpu_hw\vpu_pwrclk.c" />
+    <ClCompile Include="vpu_rpc\vpu_rpc.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\shared\mu\fsl_mu.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="circ_queue.h" />
+    <ClInclude Include="imx8q_driver.h" />
+    <ClInclude Include="imxblit_public.h" />
+    <ClInclude Include="Public.h" />
+    <ClInclude Include="Trace.h" />
+    <ClInclude Include="vpu_dec\fbl.h" />
+    <ClInclude Include="vpu_dec\vdec.h" />
+    <ClInclude Include="vpu_dec\vdec_io.h" />
+    <ClInclude Include="vpu_dec\vdec_cmn.h" />
+    <ClInclude Include="vpu_hw\vpu_hw_defs.h" />
+    <ClInclude Include="vpu_hw\vpu_memory.h" />
+    <ClInclude Include="vpu_hw\vpu_mu.h" />
+    <ClInclude Include="vpu_hw\parent_device.h" />
+    <ClInclude Include="vpu_rpc\mediasys_types.h" />
+    <ClInclude Include="vpu_rpc\vpu_rpc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Inf Include="malonekm.inf" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WppEnabled>true</WppEnabled>
+      <WppRecorderEnabled>true</WppRecorderEnabled>
+      <WppScanConfigurationData Condition="'%(ClCompile.ScanConfigurationData)' == ''">trace.h</WppScanConfigurationData>
+      <WppKernelMode>true</WppKernelMode>
+      <WppAddAlternateNameToMessageGUID>IMX8Q_VPU_KM</WppAddAlternateNameToMessageGUID>
+      <WppPreprocessorDefinitions>ENABLE_WPP_RECORDER=1;WPP_EMIT_FUNC_NAME</WppPreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Platform)'=='ARM64'">$(IntDir);%(AdditionalIncludeDirectories);$(ProjectDir)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wdmsec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <FilesToPackage Include="$(TargetPath)" />
+    <FilesToPackage Include="$(SolutionDir)Build\$(Platform)\$(Configuration)\malonekm\malonekm.sys">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+    <FilesToPackage Include="$(SolutionDir)Build\$(Platform)\$(Configuration)\malonemft\malonemft.dll">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+    <FilesToPackage Include="vpu_fw\vpu_fw_imx8_dec.bin">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+    <FilesToPackage Include="$(SolutionDir)..\..\..\components\video\vcruntime140.dll">
+      <PackageRelativeDirectory>
+      </PackageRelativeDirectory>
+    </FilesToPackage>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

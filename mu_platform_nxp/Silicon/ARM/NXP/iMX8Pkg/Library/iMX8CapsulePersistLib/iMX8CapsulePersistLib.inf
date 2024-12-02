@@ -1,0 +1,28 @@
+##
+# Copyright 2023 NXP
+#
+# SPDX-License-Identifier: BSD-3-Clause
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = iMX8CapsulePersistLib
+  FILE_GUID           = b19995e6-e88a-4f38-9b2b-7e9a078edca0
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS       = CapsulePersistLib
+
+[Sources]
+  iMX8CapsulePersistLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+
+[LibraryClasses]
+

@@ -1,0 +1,5 @@
+<Project>
+<PropertyGroup Condition="'$(PlatformToolset)' != 'WindowsKernelModeDriver10.0' And '$(PlatformToolset)' != 'WindowsUserModeDriver10.0'">
+	<PlatformToolset>v143</PlatformToolset>
+</PropertyGroup>
+</Project>

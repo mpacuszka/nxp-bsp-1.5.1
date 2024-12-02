@@ -1,0 +1,48 @@
+## @file
+#  Provides FlexSPI interface for iMX8MQ board 
+#
+#  Copyright 2023 NXP
+#  
+#  SPDX-License-Identifier: BSD-3-Clause
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = iMX8FlexSpiFslLib
+  FILE_GUID       = 6013f982-210F-4C11-B9B1-00B37Cb936CC
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = iMX8FlexSpiLib|DXE_RUNTIME_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+[Sources]
+  iMX8FlexSpiFslLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+  iMX8Pkg/iMX8Pkg.dec
+  Microsoft/MsPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  HobLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+  DebugLib
+  BaseLib
+  PcdLib
+  DxeServicesLib
+  iMX8FlexSpiLib
+  

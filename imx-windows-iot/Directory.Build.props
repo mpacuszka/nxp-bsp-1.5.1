@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '17.0'">
+     <ForceImportBeforeCppProps>$(MsbuildThisFileDirectory)\vs2022_2.props</ForceImportBeforeCppProps>
+     <ForceImportAfterCppProps>$(MsbuildThisFileDirectory)\vs2022.props</ForceImportAfterCppProps>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '16.0'">
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+     <ForceImportBeforeCppProps>$(MsbuildThisFileDirectory)\vs2019_2.props</ForceImportBeforeCppProps>
+     <ForceImportAfterCppProps>$(MsbuildThisFileDirectory)\vs2019.props</ForceImportAfterCppProps>
+  </PropertyGroup>
+</Project>
