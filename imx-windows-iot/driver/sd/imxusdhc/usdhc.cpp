@@ -317,6 +317,12 @@ SdhcSlotIssueRequest(
         sdhcExtPtr,
         "()");
 
+    if (InterlockedExchangePointer((PVOID volatile*)&sdhcExtPtr->OutstandingRequest, RequestPtr) != NULL) {
+        USDHC_LOG_ERROR(
+            sdhcExtPtr->IfrLogHandle,
+            sdhcExtPtr,
+            (__FUNCTION__ " Previous request is in progress"));
+    }
     if (RequestPtr->Type == SdRequestTypeCommandNoTransfer) {
         
         //
@@ -373,7 +379,13 @@ SdhcSlotIssueRequest(
 
     case SdRequestTypeStartTransfer:
         status = SdhcStartTransfer(sdhcExtPtr, RequestPtr);
-        if (!NT_SUCCESS(status)) {
+        if (NT_SUCCESS(status) || status == STATUS_PENDING) {
+            //
+            // On successful transfer initiation reset the status to
+            // STATUS_PENDING as expected by SDPORT.
+            //
+            status = STATUS_PENDING;
+        } else {
             USDHC_LOG_ERROR_STATUS(
                 sdhcExtPtr->IfrLogHandle,
                 sdhcExtPtr,
@@ -473,6 +485,35 @@ SdhcSlotRequestDpc(
         Errors);
 
     //
+    // WORKAROUND:
+    // This can occur when we're delaying request completion in a thread.
+    //
+    if (((Events == 0) && (Errors == 0)) || (RequestPtr->RequiredEvents == 0)) {
+        return;
+    }
+
+    //
+    // Save current events, since we may not be waiting for them
+    // at this stage, but we may be on the next phase of the command
+    // processing.
+    // For instance with short data read requests, the transfer is probably
+    // completed by the time the command is done.
+    // If that case if we wait for that events after it has already arrived,
+    // we will fail with timeout.
+    //
+    InterlockedOr((PLONG)&sdhcExtPtr->CurrentEvents, Events);
+
+    //
+    // Check for out of sequence call?
+    // SDPORT does not maintain a request state, so we may get a request that
+    // has not been issued yet!
+    //
+    if (InterlockedExchangePointer((PVOID volatile*)&sdhcExtPtr->OutstandingRequest,
+                                   sdhcExtPtr->OutstandingRequest) == NULL) {
+        return;
+    }
+
+    //
     // Clear the request's required events if they have completed.
     //
     RequestPtr->RequiredEvents &= ~Events;
@@ -481,49 +522,35 @@ SdhcSlotRequestDpc(
     // If there are errors, we need to fail whatever outstanding request
     // was on the bus. Otherwise, the request succeeded.
     // 
+    // TODO: There's a race condition here--it's possible for a request
+    // to get a transfer complete interrupt and then later receive an
+    // error interrupt for the same transfer. It might be mitigated by
+    // handling request completion in a DPC for ISR.
+    //
     if (Errors) {
-        RequestPtr->RequiredEvents = 0;
-        NTSTATUS status = SdhcConvertStandardErrorToStatus(Errors);
-        SdhcCompleteRequest(sdhcExtPtr, RequestPtr, status);
+        //
+        // Wait for CMD/DTO interrupt after timeout before completing the request.
+        //
+        if (((Errors & SDPORT_ERROR_CMD_TIMEOUT) && !(Events & SDPORT_EVENT_CARD_RESPONSE)) ||
+            ((Errors & SDPORT_ERROR_DATA_TIMEOUT) && !(Events & SDPORT_EVENT_CARD_RW_END))) {
+            goto Exit;
+        }
 
+        RequestPtr->RequiredEvents = 0;
+        InterlockedAnd((PLONG)&sdhcExtPtr->CurrentEvents, 0);
+
+        RequestPtr->Status = SdhcConvertStandardErrorToStatus(Errors);
+
+        SdhcCompleteRequest(sdhcExtPtr, RequestPtr, RequestPtr->Status);
     } else if (RequestPtr->RequiredEvents == 0) {
         if (RequestPtr->Status != STATUS_MORE_PROCESSING_REQUIRED) {
-
             RequestPtr->Status = STATUS_SUCCESS;
-
-            //
-            // WORKAROUND: uSDHC does not fire TC interrupt as specified in the datasheet
-            // for commands with Busy signal i.e R1b and R5b. To get around this and make sure
-            // Busy signal is deasserted we poll on PRES_STATE.DLA which will be 0 once
-            // the DATA line becomes inactive
-            //
-            if ((RequestPtr->Command.ResponseType == SdResponseTypeR1B) ||
-                (RequestPtr->Command.ResponseType == SdResponseTypeR5B)) {
-
-                volatile USDHC_REGISTERS* registersPtr = sdhcExtPtr->RegistersPtr;
-                USDHC_PRES_STATE_REG presState = { SdhcReadRegister(&registersPtr->PRES_STATE) };
-                UINT32 retries = USDHC_POLL_RETRY_COUNT;
-
-                while (presState.DLA && retries) {
-                    SdPortWait(USDHC_POLL_WAIT_TIME_US);
-                    presState.AsUint32 = SdhcReadRegister(&registersPtr->PRES_STATE);
-                    --retries;
-                }
-
-                if (presState.DLA) {
-                    NT_ASSERT(!retries);
-                    USDHC_LOG_ERROR(
-                        sdhcExtPtr->IfrLogHandle,
-                        sdhcExtPtr,
-                        "Time-out waiting on DAT0 to get released");
-                    RequestPtr->Status = STATUS_IO_TIMEOUT;
-                }
-            }
         }
 
         SdhcCompleteRequest(sdhcExtPtr, RequestPtr, RequestPtr->Status);
     }
 
+Exit:
     USDHC_DDI_EXIT(sdhcExtPtr->IfrLogHandle, sdhcExtPtr, "()");
 }
 
@@ -594,7 +621,7 @@ SdhcSlotClearEvents(
         sdhcExtPtr,
         "EventMask:0x%08X",
         EventMask);
-    
+
     UINT32 Interrupts =
         SdhcConvertStandardEventsToIntStatusMask(
             EventMask,
@@ -615,6 +642,7 @@ SdhcCleanup(
         NullPrivateExtensionPtr,
         "()");
 
+    USDHC_EXTENSION* sdhcExtPtr;
     USDHC_DEVICE_PROPERTIES* devPropsPtr =
         DevicePropertiesListSafeFindByPdo(SdhcMiniportGetPdo(MiniportPtr));
     if (devPropsPtr != nullptr) {
@@ -624,6 +652,14 @@ SdhcCleanup(
         //
         NT_ASSERT(MiniportPtr->SlotCount == 1);
         (VOID)DevicePropertiesListSafeRemoveByKey(devPropsPtr->Key);
+    }
+
+    for (LONG i = 0; i < MiniportPtr->SlotCount; i++) {
+        sdhcExtPtr = reinterpret_cast<USDHC_EXTENSION*>(
+            MiniportPtr->SlotExtensionList[i]->PrivateExtension);
+        if (sdhcExtPtr->CompleteRequestBusyWorkItem) {
+            IoFreeWorkItem(sdhcExtPtr->CompleteRequestBusyWorkItem);
+        }
     }
 
     SdhcLogCleanup(MiniportPtr);
@@ -794,6 +830,7 @@ SdhcSendCommand(
     // type or whether the command involves data transfer, we will need
     // to wait on a number of different events
     //
+    InterlockedAnd((PLONG)&SdhcExtPtr->CurrentEvents, 0);
     USDHC_INT_STATUS_REG requiredEvents = { 0 };
     requiredEvents.CC = 1;
 
@@ -996,12 +1033,15 @@ SdhcStartPioTransfer(
     SDPORT_REQUEST* RequestPtr
     )
 {
+    ULONG CurrentEvents;
+
     volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
     SDPORT_COMMAND* cmdPtr = &RequestPtr->Command;
 
     NT_ASSERT((cmdPtr->TransferDirection == SdTransferDirectionRead) ||
               (cmdPtr->TransferDirection == SdTransferDirectionWrite));
 
+    CurrentEvents = InterlockedExchange((PLONG)&SdhcExtPtr->CurrentEvents, 0);
     //
     // PIO transfers are paced by FIFO interrupts, where each interrupt indicates that
     // there is at least 1 RD_WML words to read or enough space for WR_WML words to write.
@@ -1033,9 +1073,9 @@ SdhcStartPioTransfer(
     USDHC_INT_STATUS_REG requiredEventsMask = { 0 };
 
     if (InterlockedCompareExchange(
-            reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
-            0,
-            0) > 0) {
+        reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
+        0,
+        0) > 0) {
         cmdPtr->DataBuffer += subTransferLength;
         if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
             requiredEventsMask.BRR = 1;
@@ -1046,6 +1086,11 @@ SdhcStartPioTransfer(
     } else {
         requiredEventsMask.TC = 1;
         RequestPtr->Status = STATUS_SUCCESS;
+        if ((CurrentEvents & SDPORT_EVENT_CARD_RW_END) != 0) {
+            SdhcCompleteRequest(SdhcExtPtr, RequestPtr, RequestPtr->Status);
+        } else {
+            requiredEventsMask.TC = 1;
+        }
     }
 
     SdhcConvertIntStatusToStandardEvents(
@@ -1292,6 +1337,43 @@ SdhcConvertStandardErrorToStatus(
 }
 
 _Use_decl_annotations_
+NTSTATUS
+SdhcWaitDataIdle(
+    _In_ USDHC_EXTENSION* SdhcExtPtr
+)
+{
+    volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
+    USDHC_PRES_STATE_REG presState;
+    UINT32 retries = USDHC_POLL_RETRY_COUNT;
+    for (retries = USDHC_POLL_RETRY_COUNT; retries > 0; retries--) {
+        presState = { SdhcReadRegister(&registersPtr->PRES_STATE) };
+        if (!presState.DLA) {
+            return STATUS_SUCCESS;
+        }
+        SdPortWait(USDHC_POLL_WAIT_TIME_US);
+    }
+
+    USDHC_LOG_ERROR_STATUS(SdhcExtPtr->IfrLogHandle, SdhcExtPtr, STATUS_IO_TIMEOUT, "Timeout");
+
+    return STATUS_IO_TIMEOUT;
+}
+
+_Use_decl_annotations_
+VOID
+SdhcCompleteRequestBusyWorker(
+    _In_opt_ PDEVICE_OBJECT DeviceObject,
+    _In_ PVOID Context
+)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+
+    USDHC_EXTENSION* SdhcExtPtr = (USDHC_EXTENSION*)Context;
+    NTSTATUS Status = SdhcWaitDataIdle(SdhcExtPtr);
+
+    SdhcCompleteRequest(SdhcExtPtr, SdhcExtPtr->OutstandingRequest, Status);
+}
+
+_Use_decl_annotations_
 VOID
 SdhcCompleteRequest(
     USDHC_EXTENSION* SdhcExtPtr,
@@ -1311,7 +1393,57 @@ SdhcCompleteRequest(
         RequestPtr->Command.Length,
         Status);
 
+    const SDPORT_REQUEST* CurRequest;
+    const SDPORT_COMMAND* Command = &RequestPtr->Command;
+    BOOLEAN IsCommandCompleted = TRUE;
+
     RequestPtr->Status = Status;
+
+    //
+    // Data commands are done after all data has been
+    // transfered.
+    //
+    //
+    // WORKAROUND: uSDHC does not fire TC interrupt as specified in the datasheet
+    // for commands with Busy signal i.e R1b and R5b. To get around this and make sure
+    // Busy signal is deasserted we poll on PRES_STATE.DLA which will be 0 once
+    // the DATA line becomes inactive
+    //
+    if ((Status == STATUS_SUCCESS) && (RequestPtr->RequiredEvents == 0) &&
+        ((RequestPtr->Command.ResponseType == SdResponseTypeR1B) ||
+         (RequestPtr->Command.ResponseType == SdResponseTypeR5B) ||
+         (RequestPtr->Command.TransferDirection == SdTransferDirectionWrite))) {
+        volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
+        USDHC_PRES_STATE_REG presState = { SdhcReadRegister(&registersPtr->PRES_STATE) };
+        if (presState.DLA) {
+            if ((SdhcExtPtr->CompleteRequestBusyWorkItem != NULL) && (KeGetCurrentIrql() == DISPATCH_LEVEL)) {
+                IoQueueWorkItem(
+                    SdhcExtPtr->CompleteRequestBusyWorkItem,
+                    SdhcCompleteRequestBusyWorker,
+                    CriticalWorkQueue,
+                    SdhcExtPtr);
+            } else {
+                SdhcCompleteRequestBusyWorker(NULL, SdhcExtPtr);
+            }
+
+            return;
+        }
+    }
+
+    if ((Command->TransferType != SdTransferTypeNone) &&
+        (Command->TransferType != SdTransferTypeUndefined)) {
+        IsCommandCompleted = Command->BlockCount == 0;
+    }
+
+    if (IsCommandCompleted) {
+        CurRequest = (const SDPORT_REQUEST*)InterlockedExchangePointer(
+            (PVOID volatile*)&SdhcExtPtr->OutstandingRequest,
+            NULL
+        );
+        if (CurRequest != RequestPtr) {
+            NT_ASSERT(FALSE);
+        }
+    }
 
     switch (RequestPtr->Type) {
     case SdRequestTypeCommandNoTransfer:
@@ -1458,6 +1590,8 @@ SdhcSlotInitialize(
     USDHC_EXTENSION* sdhcExtPtr = static_cast<USDHC_EXTENSION*>(PrivateExtensionPtr);
     NTSTATUS status;
     USDHC_HOST_CTRL_CAP_REG hostCtrlCap;
+    PSD_MINIPORT Miniport = CONTAINING_RECORD(PrivateExtensionPtr, SDPORT_SLOT_EXTENSION, PrivateExtension)->Miniport;
+    PDEVICE_OBJECT MiniportFdo = (PDEVICE_OBJECT)Miniport->ConfigurationInfo.DeviceObject;
 
     //
     // Initialize the USDHC_EXTENSION register space.
@@ -1509,7 +1643,13 @@ SdhcSlotInitialize(
                 &sdhcExtPtr->DeviceProperties,
                 devPropsPtr,
                 sizeof(*devPropsPtr));
+
+            // Ensure that the power control is always treated as not supported
+            sdhcExtPtr->DeviceProperties.SlotPowerControlSupported = FALSE;
         }
+
+        // Allocate a work item for commands with busy signaling.
+        sdhcExtPtr->CompleteRequestBusyWorkItem = IoAllocateWorkItem(MiniportFdo);
     } else {
         // FIXME: HW specific device properties are read from ACPI in SdhcGetSlotCount() method. This method is not called in crashdump mode after dump_DriverEntry() is called 
         // so these values are hardcoded here. Please keep them synchronized with values in Dsdt-Sdhc.asl ACPI table. 
@@ -1541,17 +1681,8 @@ SdhcSlotInitialize(
     //  work when slot power control is fully supported.
     //
     if (sdhcExtPtr->DeviceProperties.SlotPowerControlSupported != FALSE) {
-        BOOLEAN enable = FALSE;
-        status = SdhcSetSdBusPower(sdhcExtPtr, enable);
-        if (!NT_SUCCESS(status)) {
-            USDHC_LOG_ERROR_STATUS(
-                sdhcExtPtr->IfrLogHandle,
-                sdhcExtPtr,
-                status,
-                "SDBus power-control not working as expected");
-
-            goto Cleanup;
-        }
+        status = STATUS_NOT_SUPPORTED;
+        goto Cleanup;
     }
 
     //
@@ -1644,6 +1775,8 @@ SdhcSlotInitialize(
         capabilitiesPtr->DmaDescriptorSize = 0;
         capabilitiesPtr->Supported.ScatterGatherDma = 0;
     }
+
+    sdhcExtPtr->OutstandingRequest = NULL;
 
     status = STATUS_SUCCESS;
 
@@ -2317,10 +2450,7 @@ SdhcSetBusVoltage(
     // is already operating in 1.8V
     //
     if (SdhcExtPtr->DeviceProperties.SlotPowerControlSupported != FALSE) {
-        NTSTATUS status = SdhcSetSdBusPower(SdhcExtPtr, powerOn);
-        if (!NT_SUCCESS(status)) {
-            return status;
-        }
+        return STATUS_NOT_SUPPORTED;
     }
 
     return STATUS_SUCCESS;
@@ -2368,6 +2498,7 @@ SdhcSetSdBusPower(
     return STATUS_SUCCESS;
 }
 
+#if 0
 _Use_decl_annotations_
 BOOLEAN
 SdhcIsSlotPowerControlSupported(
@@ -2397,6 +2528,8 @@ SdhcIsSlotPowerControlSupported(
 
     return FALSE;
 }
+#endif
+
 
 _Use_decl_annotations_
 NTSTATUS SdhcSendTuneCmd(USDHC_EXTENSION* SdhcExtPtr)
