@@ -1509,6 +1509,9 @@ SdhcSlotInitialize(
                 &sdhcExtPtr->DeviceProperties,
                 devPropsPtr,
                 sizeof(*devPropsPtr));
+
+            // Ensure that the power control is always treated as not supported
+            sdhcExtPtr->DeviceProperties.SlotPowerControlSupported = FALSE;
         }
     } else {
         // FIXME: HW specific device properties are read from ACPI in SdhcGetSlotCount() method. This method is not called in crashdump mode after dump_DriverEntry() is called 
@@ -1541,17 +1544,8 @@ SdhcSlotInitialize(
     //  work when slot power control is fully supported.
     //
     if (sdhcExtPtr->DeviceProperties.SlotPowerControlSupported != FALSE) {
-        BOOLEAN enable = FALSE;
-        status = SdhcSetSdBusPower(sdhcExtPtr, enable);
-        if (!NT_SUCCESS(status)) {
-            USDHC_LOG_ERROR_STATUS(
-                sdhcExtPtr->IfrLogHandle,
-                sdhcExtPtr,
-                status,
-                "SDBus power-control not working as expected");
-
-            goto Cleanup;
-        }
+        status = STATUS_NOT_SUPPORTED;
+        goto Cleanup;
     }
 
     //
@@ -2317,10 +2311,7 @@ SdhcSetBusVoltage(
     // is already operating in 1.8V
     //
     if (SdhcExtPtr->DeviceProperties.SlotPowerControlSupported != FALSE) {
-        NTSTATUS status = SdhcSetSdBusPower(SdhcExtPtr, powerOn);
-        if (!NT_SUCCESS(status)) {
-            return status;
-        }
+        return STATUS_NOT_SUPPORTED;
     }
 
     return STATUS_SUCCESS;
@@ -2368,6 +2359,7 @@ SdhcSetSdBusPower(
     return STATUS_SUCCESS;
 }
 
+#if 0
 _Use_decl_annotations_
 BOOLEAN
 SdhcIsSlotPowerControlSupported(
@@ -2397,6 +2389,7 @@ SdhcIsSlotPowerControlSupported(
 
     return FALSE;
 }
+#endif
 
 _Use_decl_annotations_
 NTSTATUS SdhcSendTuneCmd(USDHC_EXTENSION* SdhcExtPtr)
