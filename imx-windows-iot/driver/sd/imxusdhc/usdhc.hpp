@@ -183,6 +183,7 @@ SDPORT_TOGGLE_EVENTS SdhcSlotToggleEvents;
 SDPORT_CLEAR_EVENTS SdhcSlotClearEvents;
 SDPORT_GET_CARD_DETECT_STATE SdhcSlotGetCardDetectState;
 SDPORT_GET_WRITE_PROTECT_STATE SdhcSlotGetWriteProtectState;
+SDPORT_PO_FX_POWER_CONTROL_CALLBACK SdhcPowerControlCallback;
 
 //
 // Bus operations routines

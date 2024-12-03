@@ -123,7 +123,7 @@ DriverEntry(
     initData.RequestDpc = SdhcSlotRequestDpc;
     initData.SaveContext = SdhcSlotSaveContext;
     initData.RestoreContext = SdhcSlotRestoreContext;
-    initData.PowerControlCallback = nullptr;
+    initData.PowerControlCallback = SdhcPowerControlCallback;
     initData.Cleanup = SdhcCleanup;
 
     initData.PrivateExtensionSize = sizeof(USDHC_EXTENSION);
@@ -139,6 +139,9 @@ DriverEntry(
     //
     NTSTATUS status = SdPortInitialize(DriverObjectPtr, RegistryPathPtr, &initData);
     if (!NT_SUCCESS(status)) {
+#ifdef WPP_TRACING
+        WPP_CLEANUP(DriverObjectPtr);
+#endif
         NT_ASSERTMSG("SdPortInitialize() failed", FALSE);
         return status;
     }
@@ -286,6 +289,19 @@ SdhcSlotInterrupt(
     //
     SdhcAcknowledgeInterrupts(sdhcExtPtr, intStatus.AsUint32);
 
+    PSDPORT_REQUEST Request = (PSDPORT_REQUEST)InterlockedCompareExchangePointer(
+        (PVOID volatile*)&sdhcExtPtr->OutstandingRequest, NULL, NULL);
+    if (Request != NULL) {
+        if (Request->Command.Index == 11) { // Magic number: VOLTAGE_SWITCH - not supported.
+            Request->Status = STATUS_NOT_SUPPORTED;
+            SdhcCompleteRequest(sdhcExtPtr, Request, Request->Status);
+            intStatus.TC = 1;
+            USDHC_LOG_INFORMATION(
+                sdhcExtPtr->IfrLogHandle,
+                sdhcExtPtr, "CMD11 (Voltage Switch) is not supported by this controller.");
+        }
+    }
+
     intStatus.CINS = 0;
     intStatus.CRM = 0;
     intStatus.CINT = 0;
@@ -311,18 +327,13 @@ SdhcSlotIssueRequest(
     )
 {
     USDHC_EXTENSION* sdhcExtPtr = static_cast<USDHC_EXTENSION*>(PrivateExtensionPtr);
+    NTSTATUS status;
 
     USDHC_DDI_ENTER(
         sdhcExtPtr->IfrLogHandle,
         sdhcExtPtr,
         "()");
 
-    if (InterlockedExchangePointer((PVOID volatile*)&sdhcExtPtr->OutstandingRequest, RequestPtr) != NULL) {
-        USDHC_LOG_ERROR(
-            sdhcExtPtr->IfrLogHandle,
-            sdhcExtPtr,
-            (__FUNCTION__ " Previous request is in progress"));
-    }
     if (RequestPtr->Type == SdRequestTypeCommandNoTransfer) {
         
         //
@@ -357,7 +368,13 @@ SdhcSlotIssueRequest(
             RequestPtr->Command.Length);
     }
 
-    NTSTATUS status;
+    //
+    // Acquire the outstanding request.
+    //
+    if (InterlockedExchangePointer(
+        (PVOID volatile*)&sdhcExtPtr->OutstandingRequest, RequestPtr) != NULL) {
+        USDHC_LOG_INFORMATION(sdhcExtPtr->IfrLogHandle, sdhcExtPtr, "Aborted previous request.");
+    }
 
     //
     // Always initialize the request status with a known error value
@@ -510,7 +527,7 @@ SdhcSlotRequestDpc(
     //
     if (InterlockedExchangePointer((PVOID volatile*)&sdhcExtPtr->OutstandingRequest,
                                    sdhcExtPtr->OutstandingRequest) == NULL) {
-        return;
+        goto Exit;
     }
 
     //
@@ -1393,10 +1410,6 @@ SdhcCompleteRequest(
         RequestPtr->Command.Length,
         Status);
 
-    const SDPORT_REQUEST* CurRequest;
-    const SDPORT_COMMAND* Command = &RequestPtr->Command;
-    BOOLEAN IsCommandCompleted = TRUE;
-
     RequestPtr->Status = Status;
 
     //
@@ -1430,21 +1443,6 @@ SdhcCompleteRequest(
         }
     }
 
-    if ((Command->TransferType != SdTransferTypeNone) &&
-        (Command->TransferType != SdTransferTypeUndefined)) {
-        IsCommandCompleted = Command->BlockCount == 0;
-    }
-
-    if (IsCommandCompleted) {
-        CurRequest = (const SDPORT_REQUEST*)InterlockedExchangePointer(
-            (PVOID volatile*)&SdhcExtPtr->OutstandingRequest,
-            NULL
-        );
-        if (CurRequest != RequestPtr) {
-            NT_ASSERT(FALSE);
-        }
-    }
-
     switch (RequestPtr->Type) {
     case SdRequestTypeCommandNoTransfer:
     case SdRequestTypeCommandWithTransfer:
@@ -1468,7 +1466,57 @@ SdhcCompleteRequest(
         NT_ASSERTMSG("Unsupported request type", FALSE);
     }
 
+    //
+    // Release the outstanding request if it completed successfully.
+    // Otherwise keep it around, because sdport will call ResetHost
+    // and we need to know what kind of request failed there.
+    //
+    if ((RequestPtr->Status == STATUS_SUCCESS) ||
+        (RequestPtr->Status == STATUS_MORE_PROCESSING_REQUIRED)) {
+        if ((PSDPORT_REQUEST)InterlockedExchangePointer(
+            (PVOID volatile*)&SdhcExtPtr->OutstandingRequest, NULL) != RequestPtr) {
+            NT_ASSERTMSG("Request mismatch", FALSE);
+        }
+    }
+
+    //
+    // WORKAROUND:
+    // If the card was removed, complete the request with failure
+    // to avoid a crash in sdport.
+    //
+    if (!SdhcSlotGetCardDetectState(SdhcExtPtr)) {
+        RequestPtr->Status = STATUS_IO_DEVICE_ERROR;
+
+        USDHC_LOG_ERROR(
+            SdhcExtPtr->IfrLogHandle,
+            SdhcExtPtr,
+            "Card removed - failing outstanding request!");
+    }
+
     SdPortCompleteRequest(RequestPtr, Status);
+}
+
+_Use_decl_annotations_
+NTSTATUS
+SdhcPowerControlCallback(
+    _In_ PSD_MINIPORT Miniport,
+    _In_ LPCGUID PowerControlCode,
+    _In_reads_bytes_opt_(InputBufferSize) PVOID InputBuffer,
+    _In_ SIZE_T InputBufferSize,
+    _Out_writes_bytes_opt_(OutputBufferSize) PVOID OutputBuffer,
+    _In_ SIZE_T OutputBufferSize,
+    _Out_opt_ PSIZE_T BytesReturned
+)
+{
+    UNREFERENCED_PARAMETER(Miniport);
+    UNREFERENCED_PARAMETER(PowerControlCode);
+    UNREFERENCED_PARAMETER(InputBuffer);
+    UNREFERENCED_PARAMETER(InputBufferSize);
+    UNREFERENCED_PARAMETER(OutputBuffer);
+    UNREFERENCED_PARAMETER(OutputBufferSize);
+    UNREFERENCED_PARAMETER(BytesReturned);
+
+    return STATUS_NOT_IMPLEMENTED;
 }
 
 _Use_decl_annotations_
@@ -1935,12 +1983,32 @@ SdhcResetHost(
         "ResetType:%!RESETTYPE!",
         ResetType);
 
+    PSDPORT_REQUEST Request = (PSDPORT_REQUEST)InterlockedExchangePointer(
+        (PVOID volatile*)&SdhcExtPtr->OutstandingRequest, NULL);
+    if (Request != NULL) {
+        USDHC_LOG_INFORMATION(SdhcExtPtr->IfrLogHandle, SdhcExtPtr, "Aborted outstanding request.");
+    }
+
     switch (ResetType) {
     case SdResetTypeAll:
         sysCtrlMask.RSTA = 1;
         break;
 
     case SdResetTypeCmd:
+        //
+        // Return early in case of a failed data transfer.
+        // SdResetTypeCmd is requested with interrupts masked off, which
+        // means we can't issue any local commands, such as stop transmission
+        // or retuning.
+        //
+        // sdport will call again with SdResetTypeDat (after unmasking interrupts)
+        // and we will do the entire reset sequence there.
+        //
+        if ((Request != NULL) &&
+            (Request->Command.TransferType != SdTransferTypeNone) &&
+            (Request->Command.TransferType != SdTransferTypeUndefined)) {
+            return STATUS_SUCCESS;
+        }
         sysCtrlMask.RSTC = 1;
         break;
 
