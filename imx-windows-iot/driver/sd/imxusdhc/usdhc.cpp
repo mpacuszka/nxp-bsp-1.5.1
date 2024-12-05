@@ -227,7 +227,6 @@ SdhcSlotInterrupt(
     // If there aren't any events to handle, then we don't need to
     // process anything.
     //
-
     if (intStatus.AsUint32 == 0) {
         USDHC_LOG_INFORMATION(
             sdhcExtPtr->IfrLogHandle,
@@ -1429,11 +1428,12 @@ SdhcCompleteRequest(
         volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
         USDHC_PRES_STATE_REG presState = { SdhcReadRegister(&registersPtr->PRES_STATE) };
         if (presState.DLA) {
-            if ((SdhcExtPtr->CompleteRequestBusyWorkItem != NULL) && (KeGetCurrentIrql() == DISPATCH_LEVEL)) {
+            if ((SdhcExtPtr->CompleteRequestBusyWorkItem != NULL)) {
+                WORK_QUEUE_TYPE queueType = (KeGetCurrentIrql() == DISPATCH_LEVEL) ? CriticalWorkQueue : DelayedWorkQueue;
                 IoQueueWorkItem(
                     SdhcExtPtr->CompleteRequestBusyWorkItem,
                     SdhcCompleteRequestBusyWorker,
-                    CriticalWorkQueue,
+                    queueType,
                     SdhcExtPtr);
             } else {
                 SdhcCompleteRequestBusyWorker(NULL, SdhcExtPtr);
