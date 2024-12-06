@@ -278,13 +278,7 @@ SdhcSlotInterrupt(
         }
     }
 
-    //
-    // Acknowledge/clear interrupt status. Request completions will occur in
-    // the port driver's slot completion DPC. We need to make the members of 
-    // SDPORT_REQUEST that only the port driver uses opaque to the miniport.
-    // See how Storport does this (if it does).
-    //
-    SdhcAcknowledgeInterrupts(sdhcExtPtr, intStatus.AsUint32);
+    const UINT32 statusAckValue = intStatus.AsUint32;
 
     intStatus.CINS = 0;
     intStatus.CRM = 0;
@@ -298,6 +292,14 @@ SdhcSlotInterrupt(
         (*CardChangePtr) ||
         (*SdioInterruptPtr) ||
         (*TuningPtr);
+
+    //
+    // Acknowledge/clear interrupt status. Request completions will occur in
+    // the port driver's slot completion DPC. We need to make the members of 
+    // SDPORT_REQUEST that only the port driver uses opaque to the miniport.
+    // See how Storport does this (if it does).
+    //
+    SdhcAcknowledgeInterrupts(sdhcExtPtr, statusAckValue);
 
     USDHC_DDI_EXIT(sdhcExtPtr->IfrLogHandle, sdhcExtPtr, "%!bool!", handled);
     return handled;
