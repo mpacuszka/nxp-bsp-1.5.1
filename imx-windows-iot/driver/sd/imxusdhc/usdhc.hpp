@@ -152,6 +152,13 @@ typedef struct {
     volatile BOOLEAN WaitTuningCmd;
     volatile NTSTATUS TuningStatus;
     volatile BOOLEAN TuningInProgress;
+
+    PSDPORT_REQUEST OutstandingRequest;
+    ULONG CurrentEvents;
+
+    LONG CmdIssued;
+    LONG CmdCompleted;
+    LONG CmdAborted;
     //
     // Information populated from ACPI
     //

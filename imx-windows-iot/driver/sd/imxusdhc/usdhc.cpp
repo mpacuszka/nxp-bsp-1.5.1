@@ -317,6 +317,14 @@ SdhcSlotIssueRequest(
         sdhcExtPtr,
         "()");
 
+    if (InterlockedExchangePointer((PVOID volatile *)&sdhcExtPtr->OutstandingRequest,
+                                   RequestPtr) != NULL) {
+        USDHC_LOG_INFORMATION(
+            sdhcExtPtr->IfrLogHandle,
+            sdhcExtPtr,"Previous request is in progress");
+    }
+    InterlockedIncrement(&sdhcExtPtr->CmdIssued);
+
     if (RequestPtr->Type == SdRequestTypeCommandNoTransfer) {
         
         //
@@ -471,6 +479,17 @@ SdhcSlotRequestDpc(
         RequestPtr->RequiredEvents,
         Events,
         Errors);
+
+    //
+    // Check for out of sequence call?
+    // SDPORT does not maintain a request state, so we may get a request that
+    // has not been issued yet!
+    //
+    if (InterlockedExchangePointer((PVOID volatile *)&sdhcExtPtr->OutstandingRequest,
+                                   sdhcExtPtr->OutstandingRequest)
+        == NULL) {
+        return;
+    }
 
     //
     // Clear the request's required events if they have completed.
@@ -1311,6 +1330,10 @@ SdhcCompleteRequest(
         RequestPtr->Command.Length,
         Status);
 
+    const SDPORT_REQUEST* CurRequest;
+	const SDPORT_COMMAND* Command = &RequestPtr->Command;
+    BOOLEAN IsCommandCompleted = TRUE;
+
     RequestPtr->Status = Status;
 
     switch (RequestPtr->Type) {
@@ -1336,6 +1359,26 @@ SdhcCompleteRequest(
         NT_ASSERTMSG("Unsupported request type", FALSE);
     }
 
+    //
+    // Data commands are done after all data has been
+    // transfered.
+    //
+
+    if ((Command->TransferType != SdTransferTypeNone) &&
+        (Command->TransferType != SdTransferTypeUndefined)) {
+        IsCommandCompleted = Command->BlockCount == 0;
+    }
+
+    if (IsCommandCompleted) {
+        CurRequest = (const SDPORT_REQUEST*)
+            InterlockedExchangePointer(PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
+                                       NULL);
+        if (CurRequest != Request) {
+            NT_ASSERT(FALSE);
+        }
+    }
+
+    InterlockedIncrement(&SdhcExtPtr->CmdCompleted);
     SdPortCompleteRequest(RequestPtr, Status);
 }
 
@@ -1645,6 +1688,8 @@ SdhcSlotInitialize(
         capabilitiesPtr->Supported.ScatterGatherDma = 0;
     }
 
+    sdhcExtPtr->OutstandingRequest = NULL;
+
     status = STATUS_SUCCESS;
 
 Cleanup:
@@ -1817,6 +1862,11 @@ SdhcResetHost(
 
     default:
         return STATUS_INVALID_PARAMETER;
+    }
+
+    if (InterlockedExchangePointer((PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
+                                   NULL) != NULL) {
+        InterlockedIncrement(&SdhcExtPtr->CmdAborted);
     }
 
     USDHC_SYS_CTRL_REG sysCtrl = { SdhcReadRegister(&registersPtr->SYS_CTRL) };
