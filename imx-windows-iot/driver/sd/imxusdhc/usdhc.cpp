@@ -481,6 +481,24 @@ SdhcSlotRequestDpc(
         Errors);
 
     //
+    // Miniport DPC handles command related events only!
+    //
+    if (((Events & SDHC_IS_COMMAND_EVENT) == 0) && (Errors == 0)) {
+        return;
+    }
+
+    //
+    // Save current events, since we may not be waiting for them
+    // at this stage, but we may be on the next phase of the command 
+    // processing.
+    // For instance with short data read requests, the transfer is probably
+    // completed by the time the command is done.
+    // If that case if we wait for that events after it has already arrived,
+    // we will fail with timeout.
+    //
+    InterlockedOr((PLONG)&sdhcExtPtr->CurrentEvents, Events);
+
+    //
     // Check for out of sequence call?
     // SDPORT does not maintain a request state, so we may get a request that
     // has not been issued yet!
@@ -503,6 +521,7 @@ SdhcSlotRequestDpc(
     if (Errors) {
         RequestPtr->RequiredEvents = 0;
         NTSTATUS status = SdhcConvertStandardErrorToStatus(Errors);
+        InterlockedAnd((PLONG)&sdhcExtPtr->CurrentEvents, 0);
         SdhcCompleteRequest(sdhcExtPtr, RequestPtr, status);
 
     } else if (RequestPtr->RequiredEvents == 0) {
@@ -814,6 +833,7 @@ SdhcSendCommand(
     // to wait on a number of different events
     //
     USDHC_INT_STATUS_REG requiredEvents = { 0 };
+    InterlockedAnd((PLONG)&SdhcExtPtr->CurrentEvents, 0);
     requiredEvents.CC = 1;
 
     //
@@ -1015,12 +1035,16 @@ SdhcStartPioTransfer(
     SDPORT_REQUEST* RequestPtr
     )
 {
+    ULONG CurrentEvents;
+    NTSTATUS Status = STATUS_PENDING;
     volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
     SDPORT_COMMAND* cmdPtr = &RequestPtr->Command;
 
     NT_ASSERT((cmdPtr->TransferDirection == SdTransferDirectionRead) ||
               (cmdPtr->TransferDirection == SdTransferDirectionWrite));
 
+    CurrentEvents = InterlockedExchange((PLONG)&SdhcExtPtr->CurrentEvents,
+                                        0);
     //
     // PIO transfers are paced by FIFO interrupts, where each interrupt indicates that
     // there is at least 1 RD_WML words to read or enough space for WR_WML words to write.
@@ -1048,13 +1072,14 @@ SdhcStartPioTransfer(
     InterlockedExchangeAdd(
         reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
         -static_cast<LONG>(subTransferLength));
-
+    --cmdPtr->BlockCount;
     USDHC_INT_STATUS_REG requiredEventsMask = { 0 };
 
     if (InterlockedCompareExchange(
             reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
             0,
             0) > 0) {
+        cmdPtr->DataBuffer += cmdPtr->BlockSize;
         cmdPtr->DataBuffer += subTransferLength;
         if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
             requiredEventsMask.BRR = 1;
@@ -1063,8 +1088,13 @@ SdhcStartPioTransfer(
         }
         RequestPtr->Status = STATUS_MORE_PROCESSING_REQUIRED;
     } else {
-        requiredEventsMask.TC = 1;
         RequestPtr->Status = STATUS_SUCCESS;
+        if ((CurrentEvents & SDHC_IS_TRANSFER_COMPLETE) != 0) {
+            SdhcCompleteRequest(SdhcExtPtr, RequestPtr, STATUS_SUCCESS);
+            Status = STATUS_SUCCESS;
+        } else {
+            requiredEventsMask.TC = 1;
+        }
     }
 
     SdhcConvertIntStatusToStandardEvents(
@@ -1087,7 +1117,7 @@ SdhcStartPioTransfer(
         SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
     }
 
-    return STATUS_PENDING;
+    return Status;
 }
 
 _Use_decl_annotations_
@@ -1371,9 +1401,9 @@ SdhcCompleteRequest(
 
     if (IsCommandCompleted) {
         CurRequest = (const SDPORT_REQUEST*)
-            InterlockedExchangePointer(PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
+            InterlockedExchangePointer((PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
                                        NULL);
-        if (CurRequest != Request) {
+        if (CurRequest != RequestPtr) {
             NT_ASSERT(FALSE);
         }
     }
