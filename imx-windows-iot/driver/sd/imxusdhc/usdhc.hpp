@@ -61,6 +61,35 @@
 #define USDHC_CARD_STABILIZATION_DELAY 100000
 
 //
+// Bits defined in SDHC_INTERRUPT_STATUS
+//                 SDHC_INTERRUPT_STATUS_ENABLE
+//                 SDHC_INTERRUPT_SIGNAL_ENABLE
+//
+
+#define SDHC_IS_CMD_COMPLETE                0x0001
+#define SDHC_IS_TRANSFER_COMPLETE           0x0002
+#define SDHC_IS_BLOCKGAP_EVENT              0x0004
+#define SDHC_IS_DMA_EVENT                   0x0008
+#define SDHC_IS_BUFFER_WRITE_READY          0x0010
+#define SDHC_IS_BUFFER_READ_READY           0x0020
+#define SDHC_IS_CARD_INSERTION              0x0040
+#define SDHC_IS_CARD_REMOVAL                0x0080
+#define SDHC_IS_CARD_INTERRUPT              0x0100
+#define SDHC_IS_TUNING_INTERRUPT            0x1000
+
+#define SDHC_IS_ERROR_INTERRUPT             0x8000
+
+#define SDHC_ERROR_EVENTS                   0xFFFF0000
+
+#define SDHC_IS_CARD_DETECT                 (SDHC_IS_CARD_INSERTION | \
+                                             SDHC_IS_CARD_REMOVAL)
+
+#define SDHC_IS_COMMAND_EVENT               (SDHC_IS_CMD_COMPLETE       | \
+                                             SDHC_IS_TRANSFER_COMPLETE  | \
+                                             SDHC_IS_BUFFER_WRITE_READY | \
+                                             SDHC_IS_BUFFER_READ_READY)
+
+//
 // uSDHC Device Specific Method UUID
 //
 // {D4AC1EA1-BC53-416A-9B8C-481FEE75365C}
