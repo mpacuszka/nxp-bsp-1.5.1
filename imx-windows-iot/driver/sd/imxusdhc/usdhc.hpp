@@ -85,6 +85,13 @@ DEFINE_GUID(
 
 #include <pshpack1.h>
 
+typedef enum _BLOCKSIZE_UNALIGNED_REQ_STATE {
+    UnalignedReqStateIdle = 0,
+    UnalignedReqStateReady,
+    UnalignedReqStateSendCommand,
+    UnalignedReqStateStartTransfer
+} BLOCKSIZE_UNALIGNED_REQ_STATE;
+
 //
 // Standard SDHC interrupt and error status register used for
 // conversion between uSDHC and standard SDHC events/errors
@@ -152,6 +159,13 @@ typedef struct {
     volatile BOOLEAN WaitTuningCmd;
     volatile NTSTATUS TuningStatus;
     volatile BOOLEAN TuningInProgress;
+    //
+    // The request used for the sending/reading trailing bytes of
+    // of requests with data length that is not
+    // an integer product of MaxBlockSize.
+    //
+    BLOCKSIZE_UNALIGNED_REQ_STATE UnalignedReqState;
+    SDPORT_REQUEST UnalignedRequest;
     //
     // Information populated from ACPI
     //
@@ -282,6 +296,27 @@ NTSTATUS
 SdhcStartAdmaTransfer(
     _In_ USDHC_EXTENSION* SdhcExtPtr,
     _In_ SDPORT_REQUEST* RequestPtr);
+
+BOOLEAN
+SdhcStartNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+NTSTATUS
+SdhcCompleteNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request,
+    _In_ NTSTATUS CompletionStatus);
+
+NTSTATUS
+SdhcNonBlockSizeAlignedRequestSM(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+VOID
+SdhcPrepareInternalRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
 
 //
 // General utility routines
