@@ -61,6 +61,17 @@
 #define USDHC_CARD_STABILIZATION_DELAY 100000
 
 //
+// SDHC_TRANSFER_MODE
+//
+
+#define SDHC_TM_DMA_ENABLE                  0x0001
+#define SDHC_TM_BLKCNT_ENABLE               0x0002
+#define SDHC_TM_AUTO_CMD12_ENABLE           0x0004
+#define SDHC_TM_AUTO_CMD23_ENABLE           0x0008
+#define SDHC_TM_TRANSFER_READ               0x0010
+#define SDHC_TM_MULTIBLOCK                  0x0020
+
+//
 // Bits defined in SDHC_INTERRUPT_STATUS
 //                 SDHC_INTERRUPT_STATUS_ENABLE
 //                 SDHC_INTERRUPT_SIGNAL_ENABLE
@@ -113,6 +124,13 @@ DEFINE_GUID(
 #define USDHC_DSM_REVISION_ID    0
 
 #include <pshpack1.h>
+
+typedef enum _BLOCKSIZE_UNALIGNED_REQ_STATE {
+    UnalignedReqStateIdle = 0,
+    UnalignedReqStateReady,
+    UnalignedReqStateSendCommand,
+    UnalignedReqStateStartTransfer
+} BLOCKSIZE_UNALIGNED_REQ_STATE;
 
 //
 // Standard SDHC interrupt and error status register used for
@@ -181,10 +199,21 @@ typedef struct {
     volatile BOOLEAN WaitTuningCmd;
     volatile NTSTATUS TuningStatus;
     volatile BOOLEAN TuningInProgress;
-
+    //
+    // Requests to handle.
+    //
     PSDPORT_REQUEST OutstandingRequest;
     ULONG CurrentEvents;
-
+    //
+    // The request used for the sending/reading trailing bytes of
+    // of requests with data length that is not
+    // an integer product of MaxBlockSize.
+    //
+    BLOCKSIZE_UNALIGNED_REQ_STATE UnalignedReqState;
+    SDPORT_REQUEST UnalignedRequest;
+    //
+    // Command statistics
+    //
     LONG CmdIssued;
     LONG CmdCompleted;
     LONG CmdAborted;
@@ -319,6 +348,27 @@ NTSTATUS
 SdhcStartAdmaTransfer(
     _In_ USDHC_EXTENSION* SdhcExtPtr,
     _In_ SDPORT_REQUEST* RequestPtr);
+
+BOOLEAN
+SdhcStartNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+NTSTATUS
+SdhcCompleteNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request,
+    _In_ NTSTATUS CompletionStatus);
+
+NTSTATUS
+SdhcNonBlockSizeAlignedRequestSM(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+VOID
+SdhcPrepareInternalRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
 
 //
 // General utility routines
