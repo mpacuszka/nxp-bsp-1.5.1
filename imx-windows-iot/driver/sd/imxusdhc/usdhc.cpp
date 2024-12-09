@@ -2114,6 +2114,19 @@ SdhcSlotInitialize(
 
     sdhcExtPtr->OutstandingRequest = NULL;
 
+    // Disable interrupts until we're ready to handle them. No need to have
+    // them enabled yet, and some versions of sdport.sys crash if any
+    // interrupts come at this point.
+    //
+    // Disable the interrupt signals on the controller
+    //
+    SdhcWriteRegister(&sdhcExtPtr->RegistersPtr->INT_STATUS_EN, 0);
+
+    //
+    // Disable the interrupt signals from controller to OS
+    //
+    SdhcWriteRegister(&sdhcExtPtr->RegistersPtr->INT_SIGNAL_EN, 0);
+
     status = STATUS_SUCCESS;
 
 Cleanup:
