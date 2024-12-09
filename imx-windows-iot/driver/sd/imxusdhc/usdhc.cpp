@@ -2418,7 +2418,7 @@ NTSTATUS SdhcSendTuneCmd(USDHC_EXTENSION* SdhcExtPtr)
     Request.Command.ResponseType = SdResponseTypeR1;
     Request.Command.Length = (protCtrl.DTW == USDHC_PROT_CTRL_DTW_8BIT) ? 128 : 64;
     Request.Command.BlockSize = (USHORT)Request.Command.Length;
-    Request.Command.Index = 21;
+    Request.Command.Index = (protCtrl.DTW == USDHC_PROT_CTRL_DTW_8BIT) ? SDCMD_EMMC_SEND_TUNING_BLOCK : SDCMD_SEND_TUNING_BLOCK;
     Request.Command.DataBuffer = &DataBuffer[0];
 
     SdhcExtPtr->WaitTuningCmd = TRUE;

@@ -83,6 +83,12 @@ DEFINE_GUID(
 //
 #define USDHC_DSM_REVISION_ID    0
 
+//
+// Standard SD/MMC commands
+//
+#define SDCMD_SEND_TUNING_BLOCK         19
+#define SDCMD_EMMC_SEND_TUNING_BLOCK    21
+
 #include <pshpack1.h>
 
 //
