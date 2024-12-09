@@ -524,7 +524,7 @@ SdhcSlotRequestDpc(
     if (Errors) {
         NTSTATUS status = SdhcConvertStandardErrorToStatus(Errors);
         (void)SdhcCompleteNonBlockSizeAlignedRequest(sdhcExtPtr,
-                                                     RequestPtr,
+                                                     RequestPtr, 
                                                      status);
         RequestPtr->RequiredEvents = 0;
         InterlockedAnd((PLONG)&sdhcExtPtr->CurrentEvents, 0);
@@ -960,7 +960,7 @@ SdhcConfigureTransfer(
     switch (RequestPtr->Command.Index) {
     case SDCMD_IO_RW_EXTENDED:
     {
-        SD_RW_EXTENDED_ARGUMENT* ArgumentExt =
+        SD_RW_EXTENDED_ARGUMENT* ArgumentExt = 
             (SD_RW_EXTENDED_ARGUMENT*)&RequestPtr->Command.Argument;
         //
         // Cmd53 uses I/O abort function select bits (ASx) in the CCCR
@@ -1062,7 +1062,7 @@ Request - The original unaligned request from sdport.
 
 Return value:
 
-    TRUE - Request length is not aligned to BlockSize, processing SM
+    TRUE - Request length is not aligned to BlockSize, processing SM 
         was initailzed.
     FALSE - Request length is aligned to BlockSize.
 
@@ -1099,7 +1099,7 @@ SdhcStartNonBlockSizeAlignedRequest (
         NT_ASSERT(SdhcExtension->UnalignedReqState == UnalignedReqStateIdle);
 
         //
-        // Prepare the internal request we need to read/send
+        // Prepare the internal request we need to read/send 
         // after aligned part was read/sent.
         //
         SdhcPrepareInternalRequest(SdhcExtension, Request);
@@ -1119,8 +1119,8 @@ SdhcStartNonBlockSizeAlignedRequest (
 Routine Description:
 
     SdhcCompleteNonBlockSizeAlignedRequest is called for every completed command.
-    If the command has completed successfully, it runs the
-    'Non BlockSize Aligned' state machine to handle the additional
+    If the command has completed successfully, it runs the 
+    'Non BlockSize Aligned' state machine to handle the additional 
     request that sends/reads the unaligned part.
 
 Arguments:
@@ -1156,7 +1156,7 @@ SdhcCompleteNonBlockSizeAlignedRequest (
     }
 
     //
-    // Run the state machine...
+    // Run the state machine...  
     //
     return SdhcNonBlockSizeAlignedRequestSM(SdhcExtension, Request);
 } // SdhcCompleteNonBlockSizeAlignedRequest (...)
@@ -1165,8 +1165,8 @@ SdhcCompleteNonBlockSizeAlignedRequest (
 
 Routine Description:
 
-    SdhcNonBlockSizeAlignedRequestSM implements the state machine
-    of handling the transmission of the additional request after the
+    SdhcNonBlockSizeAlignedRequestSM implements the state machine 
+    of handling the transmission of the additional request after the 
     BlockSize aligned part was received/sent.
 
 Arguments:
@@ -1179,7 +1179,7 @@ Arguments:
 
 Return value:
 
-    STATUS_MORE_PROCESSING_REQUIRED- More processing is required. Caller
+    STATUS_MORE_PROCESSING_REQUIRED- More processing is required. Caller 
     should withhold further processing for Request, otherwise caller
     may continue Request processing.
 
@@ -1272,8 +1272,8 @@ SdhcNonBlockSizeAlignedRequestSM (
 
 Routine Description:
 
-    This routine is called by SdhcStartNonBlockSizeAlignedRequest to prepare
-    the internal request that will read/write the last bytes of the unaligned
+    This routine is called by SdhcStartNonBlockSizeAlignedRequest to prepare 
+    the internal request that will read/write the last bytes of the unaligned 
     request.
 
 Arguments:
@@ -1299,7 +1299,7 @@ SdhcPrepareInternalRequest (
         (SD_RW_EXTENDED_ARGUMENT*)&InternalRequest->Command.Argument;
 
     //
-    // Prepare a single block request that transfers the last
+    // Prepare a single block request that transfers the last 
     // bytes of the original request data (of size less than BlockSize).
     //
     RtlCopyMemory(InternalRequest, Request, sizeof(SDPORT_REQUEST));
@@ -1313,7 +1313,7 @@ SdhcPrepareInternalRequest (
     //
     InternalRequest->Command.Length = Request->Command.Length % BlockSize;
     InternalRequest->Command.BlockCount = 1;
-    InternalRequest->Command.BlockSize =
+    InternalRequest->Command.BlockSize = 
         (USHORT) InternalRequest->Command.Length;
     //
     // Set the data pointer the address that follows the
@@ -1322,7 +1322,7 @@ SdhcPrepareInternalRequest (
     InternalRequest->Command.DataBuffer += (BlockSize * BlockCount);
     //
     // If the command writes to a region of addresses rather than
-    // to a single address, update the address to point the
+    // to a single address, update the address to point the 
     // address that follows the BlockSize aligned part.
     //
     if (InternalArgumentExt->u.bits.OpCode) {
@@ -1448,7 +1448,6 @@ SdhcStartPioTransfer(
             reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
             0,
             0) > 0) {
-        cmdPtr->DataBuffer += cmdPtr->BlockSize;
         cmdPtr->DataBuffer += subTransferLength;
         if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
             requiredEventsMask.BRR = 1;
@@ -2894,7 +2893,7 @@ NTSTATUS SdhcSendTuneCmd(USDHC_EXTENSION* SdhcExtPtr)
     Request.Command.ResponseType = SdResponseTypeR1;
     Request.Command.Length = (protCtrl.DTW == USDHC_PROT_CTRL_DTW_8BIT) ? 128 : 64;
     Request.Command.BlockSize = (USHORT)Request.Command.Length;
-    Request.Command.Index = 21;
+    Request.Command.Index = (protCtrl.DTW == USDHC_PROT_CTRL_DTW_8BIT) ? 21 : 19;
     Request.Command.DataBuffer = &DataBuffer[0];
 
     SdhcExtPtr->WaitTuningCmd = TRUE;
