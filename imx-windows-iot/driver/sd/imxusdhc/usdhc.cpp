@@ -1645,6 +1645,30 @@ SdhcSlotInitialize(
         capabilitiesPtr->Supported.ScatterGatherDma = 0;
     }
 
+    // DISABLE IDLE DETECTION
+    PDEVICE_OBJECT MiniportFdo = nullptr;
+    PSD_MINIPORT Miniport = CONTAINING_RECORD(sdhcExtPtr, SDPORT_SLOT_EXTENSION, PrivateExtension)->Miniport;
+    if (Miniport != NULL) {
+         MiniportFdo = (PDEVICE_OBJECT)Miniport->ConfigurationInfo.DeviceObject;
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: Miniport is NULL");
+    }
+
+    if (MiniportFdo != NULL) {
+        sdhcExtPtr->idleCounter = PoRegisterDeviceForIdleDetection(MiniportFdo, 0, 0, PowerDeviceD0);
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: MiniportFdo is NULL");
+    }
+
+    if (sdhcExtPtr->idleCounter == NULL) {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been disabled, "
+                         "an idle counter could not be allocated, "
+                         "or one or both of the time-out values were invalid\n"
+        );
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been enabled\n");
+    }
+
     status = STATUS_SUCCESS;
 
 Cleanup:
