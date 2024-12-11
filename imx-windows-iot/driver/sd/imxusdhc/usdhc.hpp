@@ -35,7 +35,7 @@
 //
 // Waits between each registry poll
 //
-#define USDHC_POLL_WAIT_TIME_US             10
+#define USDHC_POLL_WAIT_TIME_US             1
 
 //
 // Not supporting more than 1 request at a time
