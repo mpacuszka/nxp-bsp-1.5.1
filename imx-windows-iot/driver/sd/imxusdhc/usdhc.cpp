@@ -1043,6 +1043,21 @@ SdhcStartPioTransfer(
             requiredEventsMask.BWR = 1;
         }
         RequestPtr->Status = STATUS_MORE_PROCESSING_REQUIRED;
+
+        //
+        // Re-enable BRR and BWR if needed to chain the data transfer
+        //
+        // WORKAROUND: It is generally unsafe to enable interrupts from a DPC
+        // without the use of an interrupt synchronization construct, but
+        // it was found that uSDHC keeps firing the BRR and BWR interrupts and
+        // they don't get acknowledged as expected, so we disable them in the ISR
+        //
+        if (requiredEventsMask.BRR || requiredEventsMask.BWR) {
+            USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
+            intStatusEnableMask.BRR = requiredEventsMask.BRR;
+            intStatusEnableMask.BWR = requiredEventsMask.BWR;
+            SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
+        }
     } else {
         requiredEventsMask.TC = 1;
         RequestPtr->Status = STATUS_SUCCESS;
@@ -1052,21 +1067,6 @@ SdhcStartPioTransfer(
         requiredEventsMask,
         &RequestPtr->RequiredEvents,
         nullptr);
-
-    //
-    // Re-enable BRR and BWR if needed to chain the data transfer
-    //
-    // WORKAROUND: It is generally unsafe to enable interrupts from a DPC
-    // without the use of an interrupt synchronization construct, but
-    // it was found that uSDHC keeps firing the BRR and BWR interrupts and
-    // they don't get acknowledged as expected, so we disable them in the ISR
-    //
-    if (requiredEventsMask.BRR || requiredEventsMask.BWR) {
-        USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
-        intStatusEnableMask.BRR = requiredEventsMask.BRR;
-        intStatusEnableMask.BWR = requiredEventsMask.BWR;
-        SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
-    }
 
     return STATUS_PENDING;
 }
