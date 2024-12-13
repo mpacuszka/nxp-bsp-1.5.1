@@ -100,7 +100,22 @@ DriverEntry(
         NullPrivateExtensionPtr,
         "DriverObjectPtr:0x%p",
         DriverObjectPtr);
-
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241211 - Complete on out-of-sequence!\n");
     SDPORT_INITIALIZATION_DATA initData;
 
     RtlZeroMemory(&initData, sizeof(initData));
@@ -509,6 +524,18 @@ SdhcSlotRequestDpc(
     if (InterlockedExchangePointer((PVOID volatile *)&sdhcExtPtr->OutstandingRequest,
                                    sdhcExtPtr->OutstandingRequest)
         == NULL) {
+        DbgPrintEx(0, 0, "imxusdhc: out of sequence call?\n");
+        DbgPrintEx(0, 0, "imxusdhc: Errors = 0x%X\n", Errors);
+        DbgPrintEx(0, 0, "imxusdhc: Events = 0x%X\n", Events);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->Type = %d\n", RequestPtr->Type);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->Command.Index = 0x%X\n", RequestPtr->Command.Index);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->RequiredEvents = 0x%X\n", RequestPtr->RequiredEvents);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->Status = 0x%X\n", RequestPtr->Status);
+
+        ULONG CurrentEvents = InterlockedExchange((PLONG)&sdhcExtPtr->CurrentEvents, 0);
+        if ((CurrentEvents & SDHC_IS_CMD_COMPLETE) != 0) {
+            SdhcCompleteRequest(sdhcExtPtr, RequestPtr, STATUS_SUCCESS);
+        }
         return;
     }
 
@@ -863,20 +890,21 @@ SdhcSendCommand(
     //     requiredEvents.TC = 1;
     // }
     //
+    if (cmdPtr->TransferType != SdTransferTypeNone) {
+        if (cmdPtr->TransferMethod == SdTransferMethodSgDma) {
+            requiredEvents.TC = 1;
+        } else if (cmdPtr->TransferMethod == SdTransferMethodPio) {
+            if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
+                requiredEvents.BRR = 1;
+            } else {
+                requiredEvents.BWR = 1;
+            }
 
-    if (cmdPtr->TransferMethod == SdTransferMethodSgDma) {
-        requiredEvents.TC = 1;
-    } else if (cmdPtr->TransferMethod == SdTransferMethodPio) {
-        if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
-            requiredEvents.BRR = 1;
-        } else {
-            requiredEvents.BWR = 1;
+            USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
+            intStatusEnableMask.BRR = requiredEvents.BRR;
+            intStatusEnableMask.BWR = requiredEvents.BWR;
+            SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
         }
-
-        USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
-        intStatusEnableMask.BRR = requiredEvents.BRR;
-        intStatusEnableMask.BWR = requiredEvents.BWR;
-        SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
     }
 
     SdhcConvertIntStatusToStandardEvents(
@@ -2113,6 +2141,30 @@ SdhcSlotInitialize(
     RtlZeroMemory(&sdhcExtPtr->UnalignedRequest, sizeof(sdhcExtPtr->UnalignedRequest));
 
     sdhcExtPtr->OutstandingRequest = NULL;
+
+    // DISABLE IDLE DETECTION
+    PDEVICE_OBJECT MiniportFdo = nullptr;
+    PSD_MINIPORT Miniport = CONTAINING_RECORD(sdhcExtPtr, SDPORT_SLOT_EXTENSION, PrivateExtension)->Miniport;
+    if (Miniport != NULL) {
+         MiniportFdo = (PDEVICE_OBJECT)Miniport->ConfigurationInfo.DeviceObject;
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: Miniport is NULL");
+    }
+
+    if (MiniportFdo != NULL) {
+        sdhcExtPtr->idleCounter = PoRegisterDeviceForIdleDetection(MiniportFdo, 0, 0, PowerDeviceD0);
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: MiniportFdo is NULL");
+    }
+
+    if (sdhcExtPtr->idleCounter == NULL) {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been disabled, "
+                         "an idle counter could not be allocated, "
+                         "or one or both of the time-out values were invalid\n"
+        );
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been enabled\n");
+    }
 
     // Disable interrupts until we're ready to handle them. No need to have
     // them enabled yet, and some versions of sdport.sys crash if any
