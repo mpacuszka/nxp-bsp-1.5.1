@@ -61,6 +61,46 @@
 #define USDHC_CARD_STABILIZATION_DELAY 100000
 
 //
+// SDHC_TRANSFER_MODE
+//
+
+#define SDHC_TM_DMA_ENABLE                  0x0001
+#define SDHC_TM_BLKCNT_ENABLE               0x0002
+#define SDHC_TM_AUTO_CMD12_ENABLE           0x0004
+#define SDHC_TM_AUTO_CMD23_ENABLE           0x0008
+#define SDHC_TM_TRANSFER_READ               0x0010
+#define SDHC_TM_MULTIBLOCK                  0x0020
+
+//
+// Bits defined in SDHC_INTERRUPT_STATUS
+//                 SDHC_INTERRUPT_STATUS_ENABLE
+//                 SDHC_INTERRUPT_SIGNAL_ENABLE
+//
+
+#define SDHC_IS_CMD_COMPLETE                0x0001
+#define SDHC_IS_TRANSFER_COMPLETE           0x0002
+#define SDHC_IS_BLOCKGAP_EVENT              0x0004
+#define SDHC_IS_DMA_EVENT                   0x0008
+#define SDHC_IS_BUFFER_WRITE_READY          0x0010
+#define SDHC_IS_BUFFER_READ_READY           0x0020
+#define SDHC_IS_CARD_INSERTION              0x0040
+#define SDHC_IS_CARD_REMOVAL                0x0080
+#define SDHC_IS_CARD_INTERRUPT              0x0100
+#define SDHC_IS_TUNING_INTERRUPT            0x1000
+
+#define SDHC_IS_ERROR_INTERRUPT             0x8000
+
+#define SDHC_ERROR_EVENTS                   0xFFFF0000
+
+#define SDHC_IS_CARD_DETECT                 (SDHC_IS_CARD_INSERTION | \
+                                             SDHC_IS_CARD_REMOVAL)
+
+#define SDHC_IS_COMMAND_EVENT               (SDHC_IS_CMD_COMPLETE       | \
+                                             SDHC_IS_TRANSFER_COMPLETE  | \
+                                             SDHC_IS_BUFFER_WRITE_READY | \
+                                             SDHC_IS_BUFFER_READ_READY)
+
+//
 // uSDHC Device Specific Method UUID
 //
 // {D4AC1EA1-BC53-416A-9B8C-481FEE75365C}
@@ -84,6 +124,13 @@ DEFINE_GUID(
 #define USDHC_DSM_REVISION_ID    0
 
 #include <pshpack1.h>
+
+typedef enum _BLOCKSIZE_UNALIGNED_REQ_STATE {
+    UnalignedReqStateIdle = 0,
+    UnalignedReqStateReady,
+    UnalignedReqStateSendCommand,
+    UnalignedReqStateStartTransfer
+} BLOCKSIZE_UNALIGNED_REQ_STATE;
 
 //
 // Standard SDHC interrupt and error status register used for
@@ -153,6 +200,24 @@ typedef struct {
     volatile NTSTATUS TuningStatus;
     volatile BOOLEAN TuningInProgress;
     //
+    // Requests to handle.
+    //
+    PSDPORT_REQUEST OutstandingRequest;
+    ULONG CurrentEvents;
+    //
+    // The request used for the sending/reading trailing bytes of
+    // of requests with data length that is not
+    // an integer product of MaxBlockSize.
+    //
+    BLOCKSIZE_UNALIGNED_REQ_STATE UnalignedReqState;
+    SDPORT_REQUEST UnalignedRequest;
+    //
+    // Command statistics
+    //
+    LONG CmdIssued;
+    LONG CmdCompleted;
+    LONG CmdAborted;
+    //
     // Information populated from ACPI
     //
     USDHC_DEVICE_PROPERTIES DeviceProperties;
@@ -177,6 +242,7 @@ SDPORT_TOGGLE_EVENTS SdhcSlotToggleEvents;
 SDPORT_CLEAR_EVENTS SdhcSlotClearEvents;
 SDPORT_GET_CARD_DETECT_STATE SdhcSlotGetCardDetectState;
 SDPORT_GET_WRITE_PROTECT_STATE SdhcSlotGetWriteProtectState;
+SDPORT_PO_FX_POWER_CONTROL_CALLBACK SdhcPowerControlCallback;
 
 //
 // Bus operations routines
@@ -282,6 +348,27 @@ NTSTATUS
 SdhcStartAdmaTransfer(
     _In_ USDHC_EXTENSION* SdhcExtPtr,
     _In_ SDPORT_REQUEST* RequestPtr);
+
+BOOLEAN
+SdhcStartNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+NTSTATUS
+SdhcCompleteNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request,
+    _In_ NTSTATUS CompletionStatus);
+
+NTSTATUS
+SdhcNonBlockSizeAlignedRequestSM(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+VOID
+SdhcPrepareInternalRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
 
 //
 // General utility routines
