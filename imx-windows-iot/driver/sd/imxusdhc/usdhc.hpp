@@ -85,6 +85,13 @@ DEFINE_GUID(
 
 #include <pshpack1.h>
 
+typedef enum _BLOCKSIZE_UNALIGNED_REQ_STATE {
+    UnalignedReqStateIdle = 0,
+    UnalignedReqStateReady,
+    UnalignedReqStateSendCommand,
+    UnalignedReqStateStartTransfer
+} BLOCKSIZE_UNALIGNED_REQ_STATE;
+
 //
 // Standard SDHC interrupt and error status register used for
 // conversion between uSDHC and standard SDHC events/errors
@@ -153,6 +160,20 @@ typedef struct {
     volatile NTSTATUS TuningStatus;
     volatile BOOLEAN TuningInProgress;
     //
+    // Requests to handle.
+    //
+    PSDPORT_REQUEST OutstandingRequest;
+    ULONG CurrentEvents;
+    //
+    // The request used for the sending/reading trailing bytes of
+    // of requests with data length that is not
+    // an integer product of MaxBlockSize.
+    //
+    BLOCKSIZE_UNALIGNED_REQ_STATE UnalignedReqState;
+    SDPORT_REQUEST UnalignedRequest;
+
+    PULONG idleCounter;
+    //
     // Information populated from ACPI
     //
     USDHC_DEVICE_PROPERTIES DeviceProperties;
@@ -177,6 +198,7 @@ SDPORT_TOGGLE_EVENTS SdhcSlotToggleEvents;
 SDPORT_CLEAR_EVENTS SdhcSlotClearEvents;
 SDPORT_GET_CARD_DETECT_STATE SdhcSlotGetCardDetectState;
 SDPORT_GET_WRITE_PROTECT_STATE SdhcSlotGetWriteProtectState;
+SDPORT_PO_FX_POWER_CONTROL_CALLBACK SdhcPowerControlCallback;
 
 //
 // Bus operations routines
@@ -282,6 +304,27 @@ NTSTATUS
 SdhcStartAdmaTransfer(
     _In_ USDHC_EXTENSION* SdhcExtPtr,
     _In_ SDPORT_REQUEST* RequestPtr);
+
+BOOLEAN
+SdhcStartNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+NTSTATUS
+SdhcCompleteNonBlockSizeAlignedRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request,
+    _In_ NTSTATUS CompletionStatus);
+
+NTSTATUS
+SdhcNonBlockSizeAlignedRequestSM(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
+
+VOID
+SdhcPrepareInternalRequest(
+    _In_ USDHC_EXTENSION* SdhcExtension,
+    _In_ const SDPORT_REQUEST* Request);
 
 //
 // General utility routines

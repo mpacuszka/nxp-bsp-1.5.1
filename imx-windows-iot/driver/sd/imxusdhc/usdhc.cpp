@@ -18,6 +18,7 @@
 #include "precomp.hpp"
 #pragma hdrstop
 
+#include <sddef.h>
 #include "trace.hpp"
 #include "usdhc.tmh"
 
@@ -99,7 +100,12 @@ DriverEntry(
         NullPrivateExtensionPtr,
         "DriverObjectPtr:0x%p",
         DriverObjectPtr);
-
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
+    DbgPrintEx(0, 0, "imxusdhc: 20241213 - all the changes\n");
     SDPORT_INITIALIZATION_DATA initData;
 
     RtlZeroMemory(&initData, sizeof(initData));
@@ -123,7 +129,7 @@ DriverEntry(
     initData.RequestDpc = SdhcSlotRequestDpc;
     initData.SaveContext = SdhcSlotSaveContext;
     initData.RestoreContext = SdhcSlotRestoreContext;
-    initData.PowerControlCallback = nullptr;
+    initData.PowerControlCallback = SdhcPowerControlCallback;
     initData.Cleanup = SdhcCleanup;
 
     initData.PrivateExtensionSize = sizeof(USDHC_EXTENSION);
@@ -278,13 +284,7 @@ SdhcSlotInterrupt(
         }
     }
 
-    //
-    // Acknowledge/clear interrupt status. Request completions will occur in
-    // the port driver's slot completion DPC. We need to make the members of 
-    // SDPORT_REQUEST that only the port driver uses opaque to the miniport.
-    // See how Storport does this (if it does).
-    //
-    SdhcAcknowledgeInterrupts(sdhcExtPtr, intStatus.AsUint32);
+    const UINT32 statusAckValue = intStatus.AsUint32;
 
     intStatus.CINS = 0;
     intStatus.CRM = 0;
@@ -298,6 +298,14 @@ SdhcSlotInterrupt(
         (*CardChangePtr) ||
         (*SdioInterruptPtr) ||
         (*TuningPtr);
+
+    //
+    // Acknowledge/clear interrupt status. Request completions will occur in
+    // the port driver's slot completion DPC. We need to make the members of
+    // SDPORT_REQUEST that only the port driver uses opaque to the miniport.
+    // See how Storport does this (if it does).
+    //
+    SdhcAcknowledgeInterrupts(sdhcExtPtr, statusAckValue);
 
     USDHC_DDI_EXIT(sdhcExtPtr->IfrLogHandle, sdhcExtPtr, "%!bool!", handled);
     return handled;
@@ -316,6 +324,11 @@ SdhcSlotIssueRequest(
         sdhcExtPtr->IfrLogHandle,
         sdhcExtPtr,
         "()");
+
+    if (InterlockedExchangePointer((PVOID volatile *)&sdhcExtPtr->OutstandingRequest,
+                                   RequestPtr) != NULL) {
+        USDHC_LOG_INFORMATION(sdhcExtPtr->IfrLogHandle, sdhcExtPtr, "Previous request is in progress");
+    }
 
     if (RequestPtr->Type == SdRequestTypeCommandNoTransfer) {
         
@@ -473,6 +486,44 @@ SdhcSlotRequestDpc(
         Errors);
 
     //
+    // Miniport DPC handles command related events only!
+    //
+    if (((Events & SDPORT_DEVICE_CONTROLLER_EVENTS) == 0) && (Errors == 0)) {
+        return;
+    }
+
+    //
+    // Save current events, since we may not be waiting for them
+    // at this stage, but we may be on the next phase of the command
+    // processing.
+    // For instance with short data read requests, the transfer is probably
+    // completed by the time the command is done.
+    // If that case if we wait for that events after it has already arrived,
+    // we will fail with timeout.
+    //
+    InterlockedOr((PLONG)&sdhcExtPtr->CurrentEvents, Events);
+
+    //
+    // Check for out of sequence call?
+    // SDPORT does not maintain a request state, so we may get a request that
+    // has not been issued yet!
+    //
+    if (InterlockedExchangePointer((PVOID volatile *)&sdhcExtPtr->OutstandingRequest,
+                                   sdhcExtPtr->OutstandingRequest)
+        == NULL) {
+        DbgPrintEx(0, 0, "imxusdhc: out of sequence call?\n");
+        DbgPrintEx(0, 0, "imxusdhc: Errors = 0x%X, Events = 0x%X\n", Errors, Events);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->Type = %d, Command.Index = 0x%X\n", RequestPtr->Type, RequestPtr->Command.Index);
+        DbgPrintEx(0, 0, "imxusdhc: RequestPtr->RequiredEvents = 0x%X, Status = 0x%X\n", RequestPtr->RequiredEvents, RequestPtr->Status);
+
+        ULONG CurrentEvents = InterlockedExchange((PLONG)&sdhcExtPtr->CurrentEvents, 0);
+        if ((CurrentEvents & SDPORT_EVENT_CARD_RESPONSE) != 0) {
+            SdhcCompleteRequest(sdhcExtPtr, RequestPtr, STATUS_SUCCESS);
+        }
+        return;
+    }
+
+    //
     // Clear the request's required events if they have completed.
     //
     RequestPtr->RequiredEvents &= ~Events;
@@ -482,8 +533,10 @@ SdhcSlotRequestDpc(
     // was on the bus. Otherwise, the request succeeded.
     // 
     if (Errors) {
-        RequestPtr->RequiredEvents = 0;
         NTSTATUS status = SdhcConvertStandardErrorToStatus(Errors);
+        (void)SdhcCompleteNonBlockSizeAlignedRequest(sdhcExtPtr, RequestPtr, status);
+        RequestPtr->RequiredEvents = 0;
+        InterlockedAnd((PLONG)&sdhcExtPtr->CurrentEvents, 0);
         SdhcCompleteRequest(sdhcExtPtr, RequestPtr, status);
 
     } else if (RequestPtr->RequiredEvents == 0) {
@@ -519,6 +572,16 @@ SdhcSlotRequestDpc(
                     RequestPtr->Status = STATUS_IO_TIMEOUT;
                 }
             }
+        }
+        if (SdhcCompleteNonBlockSizeAlignedRequest(sdhcExtPtr,
+                                                   RequestPtr,
+                                                   RequestPtr->Status) ==
+            STATUS_MORE_PROCESSING_REQUIRED) {
+            //
+            // Unaligned request handling is in-progress,
+            // reading/writing trailing bytes...
+            //
+            return;
         }
 
         SdhcCompleteRequest(sdhcExtPtr, RequestPtr, RequestPtr->Status);
@@ -795,6 +858,7 @@ SdhcSendCommand(
     // to wait on a number of different events
     //
     USDHC_INT_STATUS_REG requiredEvents = { 0 };
+    InterlockedAnd((PLONG)&SdhcExtPtr->CurrentEvents, 0);
     requiredEvents.CC = 1;
 
     //
@@ -809,19 +873,21 @@ SdhcSendCommand(
     // }
     //
 
-    if (cmdPtr->TransferMethod == SdTransferMethodSgDma) {
-        requiredEvents.TC = 1;
-    } else if (cmdPtr->TransferMethod == SdTransferMethodPio) {
-        if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
-            requiredEvents.BRR = 1;
-        } else {
-            requiredEvents.BWR = 1;
-        }
+    if (cmdPtr->TransferType != SdTransferTypeNone) {
+        if (cmdPtr->TransferMethod == SdTransferMethodSgDma) {
+            requiredEvents.TC = 1;
+        } else if (cmdPtr->TransferMethod == SdTransferMethodPio) {
+            if (cmdPtr->TransferDirection == SdTransferDirectionRead) {
+                requiredEvents.BRR = 1;
+            } else {
+                requiredEvents.BWR = 1;
+            }
 
-        USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
-        intStatusEnableMask.BRR = requiredEvents.BRR;
-        intStatusEnableMask.BWR = requiredEvents.BWR;
-        SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
+            USDHC_INT_STATUS_REG intStatusEnableMask = { 0 };
+            intStatusEnableMask.BRR = requiredEvents.BRR;
+            intStatusEnableMask.BWR = requiredEvents.BWR;
+            SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
+        }
     }
 
     SdhcConvertIntStatusToStandardEvents(
@@ -849,6 +915,8 @@ SdhcConfigureTransfer(
 {
     volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
     SDPORT_COMMAND* cmdPtr = &RequestPtr->Command;
+    USHORT BlockCount = cmdPtr->BlockCount;
+    USHORT BlockSize = cmdPtr->BlockSize;
 
     NT_ASSERT(cmdPtr->TransferMethod != SdTransferMethodUndefined);
     NT_ASSERT(
@@ -863,6 +931,31 @@ SdhcConfigureTransfer(
     mixCtrl.BCEN = 0;
     mixCtrl.MSBSEL = 0;
 
+    //
+    // Adjust BlockSize and BlockCount for
+    // unaligned requests, if needed...
+    //
+    BlockCount = cmdPtr->BlockCount = (USHORT) (cmdPtr->Length / BlockSize);
+    if (BlockCount == 0) {
+        BlockCount = cmdPtr->BlockCount = 1;
+        BlockSize = cmdPtr->BlockSize = (USHORT) cmdPtr->Length;
+    }
+
+    //
+    // Check and start Non BlockSize aligned requests, if needed
+    //
+    if (SdhcStartNonBlockSizeAlignedRequest(SdhcExtPtr, RequestPtr)) {
+        USDHC_LOG_INFORMATION(
+            SdhcExtPtr->IfrLogHandle,
+            SdhcExtPtr,
+            "Unaligned request initiated: Cmd %d, "
+            "Length: %d, BlockCount: %d, BlockSize: %d",
+            RequestPtr->Command.Index,
+            RequestPtr->Command.Length,
+            BlockCount,
+            BlockSize);
+    }
+
     if (cmdPtr->BlockCount > 1) {
         mixCtrl.MSBSEL = 1;
         mixCtrl.BCEN = 1;
@@ -872,6 +965,32 @@ SdhcConfigureTransfer(
         }
     }
 
+    //
+    // Update command argument according to modified settings...
+    //
+    switch (RequestPtr->Command.Index) {
+    case SDCMD_IO_RW_EXTENDED:
+    {
+        SD_RW_EXTENDED_ARGUMENT* ArgumentExt = (SD_RW_EXTENDED_ARGUMENT*)&RequestPtr->Command.Argument;
+        //
+        // Cmd53 uses I/O abort function select bits (ASx) in the CCCR
+        //
+        mixCtrl.AC12EN = 0;
+
+        if (BlockCount > 1) {
+            ArgumentExt->u.bits.Count = (ULONG)BlockCount;
+            ArgumentExt->u.bits.BlockMode = 1;
+        } else {
+            NT_ASSERT(BlockCount == 1);
+            ArgumentExt->u.bits.Count = (ULONG)RequestPtr->Command.Length;
+            ArgumentExt->u.bits.BlockMode = 0;
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
     if (cmdPtr->TransferMethod == SdTransferMethodSgDma) {
         mixCtrl.DMAEN= 1;
     } else {
@@ -930,6 +1049,305 @@ SdhcConfigureTransfer(
 
     return STATUS_SUCCESS;
 }
+
+/*++
+
+Routine Description:
+
+    SdhcStartNonBlockSizeAlignedRequest is called for every command with data.
+    With SDIO Cmd53 it is possible that request data length may not
+    be integer product of BlockSize.
+    In this case an additional internal request is initialized for
+    reading/writing the trailing bytes.
+    SdhcStartNonBlockSizeAlignedRequest checks the request data length
+    and initiates the processing state machine if needed.
+
+Arguments:
+
+    SdhcExtension - Host controller specific driver context.
+
+Request - The original unaligned request from sdport.
+
+    StateStatus - The current unaligned request handling status
+
+Return value:
+
+    TRUE - Request length is not aligned to BlockSize, processing SM
+        was initailzed.
+    FALSE - Request length is aligned to BlockSize.
+
+--*/
+_Use_decl_annotations_
+BOOLEAN
+SdhcStartNonBlockSizeAlignedRequest (
+    USDHC_EXTENSION *SdhcExtension,
+    const SDPORT_REQUEST* Request
+    )
+{
+    //
+    // SDIO request (Cmd53) only
+    //
+    if (Request->Command.Index != SDCMD_IO_RW_EXTENDED) {
+        SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+        return FALSE;
+    }
+
+    if (Request == &SdhcExtension->UnalignedRequest) {
+        return FALSE;
+    }
+
+    NT_ASSERT(Request->Command.Length != 0);
+    NT_ASSERT(Request->Command.BlockCount != 0);
+    NT_ASSERT(Request->Command.BlockSize != 0);
+
+    //
+    // Check if request length is not aligned to BlockSize
+    //
+    if (Request->Command.Length >
+        (ULONG)(Request->Command.BlockCount * Request->Command.BlockSize)) {
+
+        NT_ASSERT(SdhcExtension->UnalignedReqState == UnalignedReqStateIdle);
+
+        //
+        // Prepare the internal request we need to read/send
+        // after aligned part was read/sent.
+        //
+        SdhcPrepareInternalRequest(SdhcExtension, Request);
+
+        //
+        // Start the SM
+        //
+        SdhcExtension->UnalignedReqState = UnalignedReqStateReady;
+        return TRUE;
+    }
+
+    return FALSE;
+}// SdhcStartNonBlockSizeAlignedRequest (...)
+
+/*++
+
+Routine Description:
+
+    SdhcCompleteNonBlockSizeAlignedRequest is called for every completed command.
+    If the command has completed successfully, it runs the
+    'Non BlockSize Aligned' state machine to handle the additional
+    request that sends/reads the unaligned part.
+
+Arguments:
+
+    SdhcExtension - Host controller specific driver context.
+
+    Request - The original unaligned request from sdport.
+
+    CompletionStatus - Request completion status
+
+Return value:
+
+    STATUS_MORE_PROCESSING_REQUIRED- More processing is required. Caller
+    should withhold further processing for Request, otherwise caller
+    may continue Request processing.
+
+--*/
+_Use_decl_annotations_
+NTSTATUS
+SdhcCompleteNonBlockSizeAlignedRequest (
+    USDHC_EXTENSION *SdhcExtension,
+    const SDPORT_REQUEST* Request,
+    NTSTATUS CompletionStatus
+    )
+{
+    //
+    // On error, reset the state machine...
+    //
+    if (!NT_SUCCESS(CompletionStatus) &&
+        (CompletionStatus != STATUS_MORE_PROCESSING_REQUIRED)) {
+        SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+        return STATUS_SUCCESS;
+    }
+
+    //
+    // Run the state machine...
+    //
+    return SdhcNonBlockSizeAlignedRequestSM(SdhcExtension, Request);
+} // SdhcCompleteNonBlockSizeAlignedRequest (...)
+
+/*++
+
+Routine Description:
+
+    SdhcNonBlockSizeAlignedRequestSM implements the state machine
+    of handling the transmission of the additional request after the
+    BlockSize aligned part was received/sent.
+
+Arguments:
+
+    SdhcExtension - Host controller specific driver context.
+
+    Request - The original unaligned request from sdport.
+
+    StateStatus - The current unaligned request handling status
+
+Return value:
+
+    STATUS_MORE_PROCESSING_REQUIRED- More processing is required. Caller
+    should withhold further processing for Request, otherwise caller
+    may continue Request processing.
+
+--*/
+_Use_decl_annotations_
+NTSTATUS
+SdhcNonBlockSizeAlignedRequestSM (
+    USDHC_EXTENSION *SdhcExtension,
+    const SDPORT_REQUEST* Request
+    )
+{
+    PSDPORT_REQUEST InternalRequest = &SdhcExtension->UnalignedRequest;
+    NTSTATUS Status;
+
+    switch (SdhcExtension->UnalignedReqState) {
+    case UnalignedReqStateIdle:
+    {
+        return STATUS_SUCCESS;
+    } // UnalignedReqStateIdle
+
+    case UnalignedReqStateReady:
+    {
+        //
+        // We wait until aligned part of request is done...
+        //
+        if (Request->Command.BlockCount != 0) {
+            return STATUS_SUCCESS;
+        }
+        SdhcExtension->UnalignedReqState = UnalignedReqStateSendCommand;
+
+        Status = SdhcSendCommand(SdhcExtension, InternalRequest);
+        if (!NT_SUCCESS(Status)) {
+            USDHC_LOG_INFORMATION(
+                SdhcExtension->IfrLogHandle,
+                SdhcExtension,
+                "Unaligned Cmd %d failed during SendCommand",
+                Request->Command.Index);
+            SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+            return Status;
+        }
+        return STATUS_MORE_PROCESSING_REQUIRED;
+    } // UnalignedReqStateReady
+
+    case UnalignedReqStateSendCommand:
+    {
+        SdhcExtension->UnalignedReqState = UnalignedReqStateStartTransfer;
+
+        Status = SdhcStartTransfer(SdhcExtension, InternalRequest);
+        if (!NT_SUCCESS(Status)) {
+            USDHC_LOG_INFORMATION(
+                SdhcExtension->IfrLogHandle,
+                SdhcExtension,
+                "Unaligned Cmd %d failed during StartTransfer",
+                Request->Command.Index);
+            SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+            return Status;
+        } else if (Status == STATUS_PENDING) {
+            return STATUS_MORE_PROCESSING_REQUIRED;
+        }
+
+        //
+        // Request has completed after transfer, proceed to next state
+        //
+        NT_ASSERT(Status == STATUS_SUCCESS);
+        __fallthrough;
+    } // UnalignedReqStateSendCommand
+
+    case UnalignedReqStateStartTransfer:
+    {
+        //
+        // We are done, original request can be now completed.
+        //
+        SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+        USDHC_LOG_INFORMATION(
+            SdhcExtension->IfrLogHandle,
+            SdhcExtension,
+            "Unaligned Cmd %d completed successfully",
+            Request->Command.Index);
+        return STATUS_SUCCESS;
+    } // UnalignedReqStateStartTransfer
+
+    default:
+        SdhcExtension->UnalignedReqState = UnalignedReqStateIdle;
+        return STATUS_INVALID_PARAMETER;
+    }
+
+} // SdhcNonBlockSizeAlignedRequestSM (...)
+
+/*++
+
+Routine Description:
+
+    This routine is called by SdhcStartNonBlockSizeAlignedRequest to prepare
+    the internal request that will read/write the last bytes of the unaligned
+    request.
+
+Arguments:
+
+    SdhcExtension - Host controller specific driver context.
+
+    Request - The original unaligned request from sdport.
+
+Return value:
+
+--*/
+_Use_decl_annotations_
+VOID
+SdhcPrepareInternalRequest (
+    USDHC_EXTENSION *SdhcExtension,
+    const SDPORT_REQUEST* Request
+    )
+{
+    USHORT BlockSize = Request->Command.BlockSize;
+    USHORT BlockCount = Request->Command.BlockCount;
+    PSDPORT_REQUEST InternalRequest = &SdhcExtension->UnalignedRequest;
+    SD_RW_EXTENDED_ARGUMENT* InternalArgumentExt =
+        (SD_RW_EXTENDED_ARGUMENT*)&InternalRequest->Command.Argument;
+
+    //
+    // Prepare a single block request that transfers the last
+    // bytes of the original request data (of size less than BlockSize).
+    //
+    RtlCopyMemory(InternalRequest, Request, sizeof(SDPORT_REQUEST));
+
+    //
+    // Change to a single block
+    //
+    InternalRequest->Command.TransferType = SdTransferTypeSingleBlock;
+    //
+    // Set the length parameters for the last bytes of the data
+    //
+    InternalRequest->Command.Length = Request->Command.Length % BlockSize;
+    InternalRequest->Command.BlockCount = 1;
+    InternalRequest->Command.BlockSize =
+        (USHORT) InternalRequest->Command.Length;
+    //
+    // Set the data pointer the address that follows the
+    // BlockSize aligned part.
+    //
+    InternalRequest->Command.DataBuffer += (BlockSize * BlockCount);
+    //
+    // If the command writes to a region of addresses rather than
+    // to a single address, update the address to point the
+    // address that follows the BlockSize aligned part.
+    //
+    if (InternalArgumentExt->u.bits.OpCode) {
+        InternalArgumentExt->u.bits.Address += (BlockSize * BlockCount);
+    }
+    USDHC_LOG_INFORMATION(
+        SdhcExtension->IfrLogHandle,
+        SdhcExtension,
+        "Preparing Unaligned Cmd %d, Addr: %x, Length: %d, Orig Length %d, Block size: %d",
+        Request->Command.Index,
+        InternalArgumentExt->u.bits.Address,
+        InternalRequest->Command.Length,
+        Request->Command.Length,
+        BlockSize);
+} // SdhcPrepareInternalRequest (...)
 
 _Use_decl_annotations_
 VOID
@@ -996,12 +1414,15 @@ SdhcStartPioTransfer(
     SDPORT_REQUEST* RequestPtr
     )
 {
+    ULONG CurrentEvents;
+    NTSTATUS Status = STATUS_PENDING;
     volatile USDHC_REGISTERS* registersPtr = SdhcExtPtr->RegistersPtr;
     SDPORT_COMMAND* cmdPtr = &RequestPtr->Command;
 
     NT_ASSERT((cmdPtr->TransferDirection == SdTransferDirectionRead) ||
               (cmdPtr->TransferDirection == SdTransferDirectionWrite));
 
+    CurrentEvents = InterlockedExchange((PLONG)&SdhcExtPtr->CurrentEvents, 0);
     //
     // PIO transfers are paced by FIFO interrupts, where each interrupt indicates that
     // there is at least 1 RD_WML words to read or enough space for WR_WML words to write.
@@ -1029,7 +1450,7 @@ SdhcStartPioTransfer(
     InterlockedExchangeAdd(
         reinterpret_cast<volatile LONG*>(&SdhcExtPtr->CurrentTransferRemainingLength),
         -static_cast<LONG>(subTransferLength));
-
+    --cmdPtr->BlockCount;
     USDHC_INT_STATUS_REG requiredEventsMask = { 0 };
 
     if (InterlockedCompareExchange(
@@ -1044,8 +1465,13 @@ SdhcStartPioTransfer(
         }
         RequestPtr->Status = STATUS_MORE_PROCESSING_REQUIRED;
     } else {
-        requiredEventsMask.TC = 1;
         RequestPtr->Status = STATUS_SUCCESS;
+        if ((CurrentEvents & SDPORT_EVENT_CARD_RW_END) != 0) {
+            SdhcCompleteRequest(SdhcExtPtr, RequestPtr, STATUS_SUCCESS);
+            Status = STATUS_SUCCESS;
+        } else {
+            requiredEventsMask.TC = 1;
+        }
     }
 
     SdhcConvertIntStatusToStandardEvents(
@@ -1068,7 +1494,7 @@ SdhcStartPioTransfer(
         SdhcEnableInterrupt(SdhcExtPtr, intStatusEnableMask.AsUint32);
     }
 
-    return STATUS_PENDING;
+    return Status;
 }
 
 _Use_decl_annotations_
@@ -1311,6 +1737,10 @@ SdhcCompleteRequest(
         RequestPtr->Command.Length,
         Status);
 
+    const SDPORT_REQUEST* CurRequest;
+	const SDPORT_COMMAND* Command = &RequestPtr->Command;
+    BOOLEAN IsCommandCompleted = TRUE;
+
     RequestPtr->Status = Status;
 
     switch (RequestPtr->Type) {
@@ -1336,7 +1766,53 @@ SdhcCompleteRequest(
         NT_ASSERTMSG("Unsupported request type", FALSE);
     }
 
+    if (RequestPtr == &SdhcExtPtr->UnalignedRequest) {
+        return;
+    }
+
+    //
+    // Data commands are done after all data has been
+    // transfered.
+    //
+
+    if ((Command->TransferType != SdTransferTypeNone) &&
+        (Command->TransferType != SdTransferTypeUndefined)) {
+        IsCommandCompleted = Command->BlockCount == 0;
+    }
+
+    if (IsCommandCompleted) {
+        CurRequest = (const SDPORT_REQUEST*)
+            InterlockedExchangePointer((PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
+                                       NULL);
+        if (CurRequest != RequestPtr) {
+            NT_ASSERT(FALSE);
+        }
+    }
+
     SdPortCompleteRequest(RequestPtr, Status);
+}
+
+_Use_decl_annotations_
+NTSTATUS
+SdhcPowerControlCallback(
+    _In_ PSD_MINIPORT Miniport,
+    _In_ LPCGUID PowerControlCode,
+    _In_reads_bytes_opt_(InputBufferSize) PVOID InputBuffer,
+    _In_ SIZE_T InputBufferSize,
+    _Out_writes_bytes_opt_(OutputBufferSize) PVOID OutputBuffer,
+    _In_ SIZE_T OutputBufferSize,
+    _Out_opt_ PSIZE_T BytesReturned
+)
+{
+    UNREFERENCED_PARAMETER(Miniport);
+    UNREFERENCED_PARAMETER(PowerControlCode);
+    UNREFERENCED_PARAMETER(InputBuffer);
+    UNREFERENCED_PARAMETER(InputBufferSize);
+    UNREFERENCED_PARAMETER(OutputBuffer);
+    UNREFERENCED_PARAMETER(OutputBufferSize);
+    UNREFERENCED_PARAMETER(BytesReturned);
+
+    return STATUS_NOT_IMPLEMENTED;
 }
 
 _Use_decl_annotations_
@@ -1645,6 +2121,35 @@ SdhcSlotInitialize(
         capabilitiesPtr->Supported.ScatterGatherDma = 0;
     }
 
+    sdhcExtPtr->UnalignedReqState = UnalignedReqStateIdle;
+    RtlZeroMemory(&sdhcExtPtr->UnalignedRequest, sizeof(sdhcExtPtr->UnalignedRequest));
+
+    sdhcExtPtr->OutstandingRequest = NULL;
+
+    // DISABLE IDLE DETECTION
+    PDEVICE_OBJECT MiniportFdo = nullptr;
+    PSD_MINIPORT Miniport = CONTAINING_RECORD(sdhcExtPtr, SDPORT_SLOT_EXTENSION, PrivateExtension)->Miniport;
+    if (Miniport != NULL) {
+         MiniportFdo = (PDEVICE_OBJECT)Miniport->ConfigurationInfo.DeviceObject;
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: Miniport is NULL");
+    }
+
+    if (MiniportFdo != NULL) {
+        sdhcExtPtr->idleCounter = PoRegisterDeviceForIdleDetection(MiniportFdo, 0, 0, PowerDeviceD0);
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: MiniportFdo is NULL");
+    }
+
+    if (sdhcExtPtr->idleCounter == NULL) {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been disabled, "
+                         "an idle counter could not be allocated, "
+                         "or one or both of the time-out values were invalid\n"
+        );
+    } else {
+        DbgPrintEx(0, 0, "imxusdhc: idle detection has been enabled\n");
+    }
+
     status = STATUS_SUCCESS;
 
 Cleanup:
@@ -1818,6 +2323,12 @@ SdhcResetHost(
     default:
         return STATUS_INVALID_PARAMETER;
     }
+
+    if (InterlockedExchangePointer((PVOID volatile *)&SdhcExtPtr->OutstandingRequest,
+                                   NULL) != NULL) {
+        USDHC_LOG_INFORMATION(SdhcExtPtr->IfrLogHandle, SdhcExtPtr, "Command aborted");
+    }
+    SdhcExtPtr->UnalignedReqState = UnalignedReqStateIdle;
 
     USDHC_SYS_CTRL_REG sysCtrl = { SdhcReadRegister(&registersPtr->SYS_CTRL) };
     sysCtrl.AsUint32 |= sysCtrlMask.AsUint32;
